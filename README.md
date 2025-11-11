@@ -961,6 +961,278 @@ PRIVATE SERVER (Another VPC)
 | **VPC Peering**      | Connects VPCs privately using internal IPs           |
 
 ---
+# 🚏 AWS Transit Gateway (TGW) — Complete Guide
+
+> Learn how to use **AWS Transit Gateway (TGW)** to connect multiple VPCs, on-premises networks, and regions seamlessly — all from a **central hub**.
+
+---
+
+## 🌐 What is a Transit Gateway?
+
+![Docker Initialization](11.png)
+
+
+**Definition:**  
+A **Transit Gateway (TGW)** is a **central hub** that connects multiple **VPCs**, **on-premises networks (via VPN or Direct Connect)**, and even **other AWS accounts**.  
+It simplifies complex network architectures by acting as a single routing hub.
+
+> ⚠️ Transit Gateway works **only within the same AWS Region**, but supports **inter-region peering**.
+
+---
+
+## 🕸️ Model: Hub-and-Spoke Architecture
+
+- **Transit Gateway = Hub**  
+- **VPCs / On-premises networks = Spokes**
+
+Instead of connecting every VPC to every other VPC (full mesh), each connects only to the **TGW** — greatly reducing complexity.
+
+---
+
+## 🎯 Purpose of Transit Gateway
+
+- Replaces complex **VPC peering meshes**
+- Simplifies connectivity between multiple VPCs or accounts
+- Enables centralized **routing, monitoring, and security**
+
+---
+
+## ⚙️ Key Features
+
+✅ Centralized routing and traffic control  
+✅ Connects **thousands of VPCs**  
+✅ Simplifies management vs. multiple VPC peerings  
+✅ Highly scalable for large cloud networks  
+✅ Supports **inter-region peering** between TGWs  
+
+---
+
+## 🌟 Benefits
+
+- **Simplified network design**  
+- **Reduced complexity** (no need for many peerings)  
+- **Centralized monitoring & control**  
+- **Improved scalability and maintainability**
+
+---
+
+## 🔌 AWS Direct Connect
+
+> **AWS Direct Connect** is a **dedicated private network connection** between your **on-premises data center** and **AWS**.
+
+### 🔹 Features:
+- Lower latency & higher bandwidth than internet-based VPN  
+- Consistent and secure performance  
+- Connects on-premises routers directly to AWS TGW or VPC  
+
+---
+
+# 🧭 Tutorial: AWS Transit Gateway (Same Region Setup)
+
+---
+
+## 🧩 Step 1: Create Two VPCs
+
+- **VPC-A:** Contains both **Public** and **Private** subnets  
+- **VPC-B:** Contains only **Private** subnet  
+
+> Each VPC will have its own route table and subnets.
+
+---
+
+## 🖥️ Step 2: Launch EC2 Instances
+
+- **Launch 3 instances total:**
+  - 1 instance in **Public subnet (VPC-A)**
+  - 2 instances in **Private subnets** (one in each VPC)
+
+---
+
+## 🌉 Step 3: Create Transit Gateway
+
+1. Go to **VPC → Transit Gateways → Create Transit Gateway**  
+2. Add a **Name**  
+3. State will initially appear as **Pending**
+
+---
+
+## 🔗 Step 4: Create TGW Attachments
+
+1. Go to **VPC → Transit Gateway Attachments**  
+2. Choose your **TGW ID**  
+3. Select **Attachment Type: VPC**  
+4. Create **2 attachments** — one for each VPC (A and B)
+
+---
+
+## 🛣️ Step 5: Edit Route Tables
+
+- **VPC-A (Private Route Table):**
+  - Add route → **Destination:** VPC-B CIDR  
+  - **Target:** Transit Gateway
+    ![Docker Initialization](12.png)
+
+
+- **VPC-B (Private Route Table):**
+  - Add route → **Destination:** VPC-A CIDR  
+  - **Target:** Transit Gateway
+    ![Docker Initialization](13.png)
+  
+
+---
+
+## 🛡️ Step 6: Edit Security Groups
+
+- Modify **Security Group** of the **destination (private)** instance  
+- Add rule:
+```
+
+Type: ICMP
+Protocol: Echo Request
+Source: Other VPC CIDR Range
+
+````
+
+---
+
+## 🧪 Step 7: Verify Connectivity
+
+From **VPC-A’s private instance**, test connection to **VPC-B**:
+```bash
+ping <Private-IP-of-VPC-B-instance>
+````
+
+✅ Successful ping → Transit Gateway connection is working!
+
+---
+
+# 🌍 Cross-Region Transit Gateway Peering Exercise
+
+> Let’s connect **two VPCs in different AWS regions** using **Transit Gateways** and **TGW Peering**.
+
+---
+
+## 🌏 Step 1: Create Two VPCs
+
+* **VPC-A (North Virginia):** Contains **Public + Private** subnets → (Requester)
+* **VPC-B (Mumbai):** Contains **Private** subnet only → (Accepter)
+
+---
+
+## 🖥️ Step 2: Launch EC2 Instances
+
+* Launch instances:
+
+  * **2 instances in North Virginia**
+  * **1 instance in Mumbai**
+
+---
+
+## 🚏 Step 3: Create Transit Gateways and Attachments
+
+1. Create **Transit Gateway** in each region
+2. Create attachments:
+
+   * **VPC-A TGW:** 2 attachments (for both subnets)
+   * **VPC-B TGW:** 1 attachment
+3. For cross-region communication:
+
+   * Create a **Peering Attachment** between both TGWs
+   * Accept request from the **receiving region** (Mumbai)
+
+> 🧠 Use “Peering Connection” as the **attachment type** during TGW setup.
+
+![Docker Initialization](14.png)
+
+
+---
+
+## 🛣️ Step 4: Transit Gateway Route Tables
+
+* **Virginia TGW Route Table:**
+
+  * Add route → **Destination:** Mumbai VPC CIDR
+  * **Target:** Peering Attachment
+
+* **Mumbai TGW Route Table:**
+
+  * Add route → **Destination:** Virginia VPC CIDR
+  * **Target:** Peering Attachment
+
+---
+
+## 🧾 Step 5: VPC Route Tables
+
+* **Virginia Private Subnet Route Table:**
+
+  * Destination → Mumbai CIDR
+  * Target → Virginia TGW Attachment
+
+* **Mumbai Private Subnet Route Table:**
+
+  * Destination → Virginia CIDR
+  * Target → Mumbai TGW Attachment
+
+---
+
+## 🔐 Step 6: Security Groups
+
+* **Mumbai Private EC2 Security Group:**
+
+  * Allow **ICMP (ping)** from Virginia VPC CIDR
+
+* **Virginia Private EC2 Security Group:**
+
+  * Allow outbound (default `0.0.0.0/0` covers ICMP reply)
+
+---
+
+## 🧩 Step 7: Verify Connection
+
+SSH into your **Virginia jump server**, then your **private instance**, and run:
+
+```bash
+ping <Mumbai-private-server-IP>
+```
+
+✅ If ping succeeds, your **cross-region TGW peering** works correctly!
+
+---
+
+## 💻 To SSH into Mumbai Server (via Virginia)
+
+1. From **Virginia Private Server**, create a file using `vi`
+2. Paste the **Mumbai key content** into it
+3. Set permission:
+
+   ```bash
+   chmod 700 <keyfile>
+   ```
+4. Connect:
+
+   ```bash
+   ssh -i <keyfile> ec2-user@<Mumbai-Private-IP>
+   ```
+
+---
+
+# 🧠 Key Takeaways
+
+| Concept                   | Description                                  |
+| ------------------------- | -------------------------------------------- |
+| **Transit Gateway (TGW)** | Central hub for VPC and on-prem connectivity |
+| **TGW Attachment**        | Connects a VPC or network to the TGW         |
+| **TGW Peering**           | Connects TGWs across regions                 |
+| **AWS Direct Connect**    | Dedicated on-premises to AWS link            |
+| **Security Group (SG)**   | Instance-level firewall                      |
+| **ICMP (Ping)**           | Used to verify private connectivity          |
+
+---
+
+> 🚀 **Pro Tip:**
+> Transit Gateway is like AWS’s **network backbone** — build once, and it scales to thousands of VPCs effortlessly.
+
+
 
 
 
