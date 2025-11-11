@@ -705,4 +705,265 @@ ssh -i "C:\Users\shyam\Downloads\Test-Server-Key.pem" ec2-user@67.202.33.11
 ![Docker Initialization](gg.png)
 
 ---
+# ☁️ AWS Networking — NAT, Elastic IP, Firewall, and VPC Peering
+
+> A complete guide to **AWS networking components** including **NAT Gateway**, **Elastic IP**, **NACLs**, **Security Groups**, and **VPC Peering Lifecycle**.  
+> Simplified and ready for study or documentation.
+
+---
+
+## 🌐 NAT (Network Address Translation)
+
+In AWS, **NAT** allows instances in a **private subnet** to access the **internet** (for updates, APIs, etc.) without exposing them to inbound internet traffic.
+
+### 💡 Use Case
+Private servers can **download updates** via NAT Gateway,  
+but **remain inaccessible** from the internet.
+
+---
+
+### ⚙️ Steps to Access Internet from Private Server via NAT
+
+1. Create a **NAT Gateway** from the VPC console  
+2. Select your **Public Subnet**  
+3. Allocate an **Elastic IP**  
+4. Create the **NAT Gateway**  
+5. Assign the NAT Gateway to **Private Route Table**  
+6. Add a new route:
+   - **Destination:** `0.0.0.0/0`
+   - **Target:** NAT Gateway
+
+✅ Done! Private instances now have **outbound internet access** without being exposed publicly.
+
+---
+
+## 🌍 Elastic IP (EIP)
+
+An **Elastic IP (EIP)** is a **static, public IPv4 address** that stays permanently allocated to your AWS account.
+
+### 📌 Key Points
+
+- **Static:** Unlike normal public IPs (which change when you stop/start an instance), an EIP **remains the same**.  
+- **Re-mappable:** You can detach it from one instance and attach it to another — useful for **failover or recovery**.  
+- **Purpose:** Provides a **permanent and consistent** public IP for EC2 instances or other resources.
+
+---
+
+### ⚙️ Steps to Allocate and Manage Elastic IP
+
+1. Go to **VPC → Elastic IPs → Allocate Elastic IP Address**
+2. Once allocated → **Actions → Associate Elastic IP**
+3. Select the **EC2 instance** and **Save**
+4. After use:
+   - **Disassociate** the IP  
+   - **Release** it from your account  
+
+---
+
+## 🔥 Firewall in VPC
+
+AWS VPC provides **two firewall layers** to control inbound and outbound traffic.
+
+| Firewall Type | Level | Stateful | Description |
+|----------------|--------|-----------|--------------|
+| **Network ACL (NACL)** | Subnet-level | ❌ Stateless | Controls subnet traffic using numbered rules |
+| **Security Group** | Instance-level | ✅ Stateful | Controls inbound/outbound traffic for EC2 |
+
+![Docker Initialization](1.png)
+
+---
+
+## 🧱 Setting Up NACL (Network Access Control List)
+
+### ⚙️ Steps:
+
+1. Go to **VPC → Network ACLs → Create**
+2. Select your **VPC**  
+3. Under **Subnet Associations**, add the subnet(s) you want  
+4. Add **Inbound** and **Outbound** rules (both mandatory)  
+5. Remember:
+   - Lower **Rule Number** = Higher priority  
+   - `*` (asterisk) = Lowest priority
+  ![Docker Initialization](2.png)
+  ![Docker Initialization](3.png)
+
+6. Outbound traffic should allow **All Traffic** for internet access
+
+> 🚫 Based on the configured rules and ports, the server traffic may be **allowed or denied**.
+
+---
+
+## 🛡️ Setting Up Security Groups
+
+### ⚙️ Steps:
+
+1. Go to **VPC → Security Groups → Create Security Group**
+2. Add **Inbound Rules** (Outbound rules are open by default)
+   ![Docker Initialization](4.png)
+4. To attach:
+   - EC2 → **Actions → Security → Change Security Groups**
+   - Remove the existing group  
+   - Add your **new custom Security Group**
+
+✅ Security Groups are **stateful**, meaning return traffic is automatically allowed.
+
+---
+
+## 🔢 Port Numbers
+
+| Type | Range | Description |
+|-------|--------|-------------|
+| **Total** | 0 – 65535 | All available ports |
+| **Well-known Ports** | 0 – 1023 | Common services (HTTP, SSH, etc.) |
+| **Registered Ports** | 1024 – 49151 | User and system applications |
+| **Dynamic Ports** | 49152 – 65535 | Private/temporary connections |
+
+---
+
+## 🔁 VPC Peering Connection Lifecycle
+
+Below are the stages of a **VPC Peering Connection** in AWS.
+
+![Docker Initialization](5.png)
+
+
+| State | Description |
+|--------|--------------|
+| **Initiating-request** | A VPC peering request is created by the requester |
+| **Pending-acceptance** | Waiting for the accepter VPC to approve |
+| **Active** | Peering successfully established |
+| **Provisioning** | Connection setup in progress |
+| **Deleting** | Connection is being removed |
+| **Deleted** | Peering removed completely |
+| **Failed** | Request could not be completed |
+| **Expired** | Request not accepted in time |
+| **Rejected** | Request denied by the accepter |
+| **No longer visible** | Removed from console after failure/rejection |
+
+---
+
+## 🌉 VPC Peering Connection
+
+**Definition:**  
+A **VPC Peering Connection** enables **two VPCs** to communicate using **private IP addresses**, making them appear as if they’re on the same internal network.
+
+---
+
+### ⚙️ STEP 1 — Create Two VPCs
+
+1. **VPC A:** Public + Private Subnets  
+2. **VPC B:** Private Subnet only  
+3. AWS automatically creates:
+   - Route Tables  
+   - Internet Gateway  
+   - Public & Private Subnets  
+
+Example setup:
+- **VPC A:** (Public + Private Subnets)  
+- **VPC B:** (Private Subnet only)
+
+---
+
+### ⚙️ STEP 2 — Create EC2 Instances
+
+1. Launch **3 EC2 Instances**
+   - Instance 1 → VPC A (Public Subnet)
+   - Instance 2 → VPC A (Private Subnet)
+   - Instance 3 → VPC B (Private Subnet)
+     ![Docker Initialization](6.png)
+
+2. At this stage, **VPC A** and **VPC B** cannot communicate (no peering yet).
+
+---
+
+### ⚙️ STEP 3 — Create the Peering Connection
+
+1. Go to **VPC → Peering Connections → Create**
+2. **Requester:** VPC A (Public + Private)  
+   **Accepter:** VPC B (Private only)
+3. Once created → Select Peering → **Actions → Accept Request**
+
+---
+
+### ⚙️ STEP 4 — Update Route Tables
+
+- **Private Route Table (VPC A):**
+  - Destination: CIDR range of VPC B
+  - Target: Peering Connection
+    ![Docker Initialization](7.png)
+
+
+- **Private Route Table (VPC B):**
+  - Destination: CIDR range of VPC A
+  - Target: Peering Connection  
+  ![Docker Initialization](8.png)
+
+---
+
+### ⚙️ STEP 5 — Configure Security Groups
+
+- Go to **EC2 → Security → Edit Inbound Rules**
+- Add **ICMP (Ping)** rule to allow communication between private instances  
+  (used for testing connectivity)
+![Docker Initialization](9.png)
+
+---
+
+### ⚙️ STEP 6 — Verify Connection
+
+From the **Private Instance in VPC A**, test connection to **Private Instance in VPC B:**
+![Docker Initialization](10.png)
+
+
+```bash
+ping <Private-IP-of-VPC-B-instance>
+````
+
+✅ If ping succeeds, VPC Peering is active and functional.
+
+---
+
+## 🧠 Notes
+
+* VPC Peering **across regions** requires **different key pairs**
+* When peering **between AWS accounts**, copy the **VPC ID** of the peer account
+* Both accounts must have at least **one public and one private subnet**
+* Number of possible Peering Connections:
+
+  ```
+  n(n - 1) / 2
+  ```
+
+---
+
+## 🔁 Connection Flow Diagram (Text Representation)
+
+```
+JUMP SERVER (Public)
+   ↓
+PRIVATE SERVER (Same VPC)
+   ↓
+VPC PEERING CONNECTION
+   ↓
+PRIVATE SERVER (Another VPC)
+```
+
+---
+
+## 🧩 Summary Table
+
+| Component            | Purpose                                              |
+| -------------------- | ---------------------------------------------------- |
+| **NAT Gateway**      | Allows private instances to access internet securely |
+| **Elastic IP (EIP)** | Static, public IPv4 address for instances            |
+| **NACL**             | Subnet-level firewall (stateless)                    |
+| **Security Group**   | Instance-level firewall (stateful)                   |
+| **VPC Peering**      | Connects VPCs privately using internal IPs           |
+
+---
+
+
+
+
+
 
