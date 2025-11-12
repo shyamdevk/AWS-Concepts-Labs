@@ -769,8 +769,7 @@ AWS VPC provides **two firewall layers** to control inbound and outbound traffic
 | **Network ACL (NACL)** | Subnet-level | ❌ Stateless | Controls subnet traffic using numbered rules |
 | **Security Group** | Instance-level | ✅ Stateful | Controls inbound/outbound traffic for EC2 |
 
-![Docker Initialization](1.png)
-
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/1.png)
 ---
 
 ## 🧱 Setting Up NACL (Network Access Control List)
@@ -784,8 +783,8 @@ AWS VPC provides **two firewall layers** to control inbound and outbound traffic
 5. Remember:
    - Lower **Rule Number** = Higher priority  
    - `*` (asterisk) = Lowest priority
-  ![Docker Initialization](2.png)
-  ![Docker Initialization](3.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/2.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/3.png)
 
 6. Outbound traffic should allow **All Traffic** for internet access
 
@@ -799,7 +798,7 @@ AWS VPC provides **two firewall layers** to control inbound and outbound traffic
 
 1. Go to **VPC → Security Groups → Create Security Group**
 2. Add **Inbound Rules** (Outbound rules are open by default)
-   ![Docker Initialization](4.png)
+  ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/4.png)
 4. To attach:
    - EC2 → **Actions → Security → Change Security Groups**
    - Remove the existing group  
@@ -824,7 +823,7 @@ AWS VPC provides **two firewall layers** to control inbound and outbound traffic
 
 Below are the stages of a **VPC Peering Connection** in AWS.
 
-![Docker Initialization](5.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/5.png)
 
 
 | State | Description |
@@ -870,7 +869,7 @@ Example setup:
    - Instance 1 → VPC A (Public Subnet)
    - Instance 2 → VPC A (Private Subnet)
    - Instance 3 → VPC B (Private Subnet)
-     ![Docker Initialization](6.png)
+     ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/6.png)
 
 2. At this stage, **VPC A** and **VPC B** cannot communicate (no peering yet).
 
@@ -890,13 +889,13 @@ Example setup:
 - **Private Route Table (VPC A):**
   - Destination: CIDR range of VPC B
   - Target: Peering Connection
-    ![Docker Initialization](7.png)
+    ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/7.png)
 
 
 - **Private Route Table (VPC B):**
   - Destination: CIDR range of VPC A
   - Target: Peering Connection  
-  ![Docker Initialization](8.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/8.png)
 
 ---
 
@@ -905,14 +904,14 @@ Example setup:
 - Go to **EC2 → Security → Edit Inbound Rules**
 - Add **ICMP (Ping)** rule to allow communication between private instances  
   (used for testing connectivity)
-![Docker Initialization](9.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/9.png)
 
 ---
 
 ### ⚙️ STEP 6 — Verify Connection
 
 From the **Private Instance in VPC A**, test connection to **Private Instance in VPC B:**
-![Docker Initialization](10.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/10.png)
 
 
 ```bash
@@ -969,7 +968,7 @@ PRIVATE SERVER (Another VPC)
 
 ## 🌐 What is a Transit Gateway?
 
-![Docker Initialization](11.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/11.png)
 
 
 **Definition:**  
@@ -1070,13 +1069,13 @@ Instead of connecting every VPC to every other VPC (full mesh), each connects on
 - **VPC-A (Private Route Table):**
   - Add route → **Destination:** VPC-B CIDR  
   - **Target:** Transit Gateway
-    ![Docker Initialization](12.png)
+    ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/12.png)
 
 
 - **VPC-B (Private Route Table):**
   - Add route → **Destination:** VPC-A CIDR  
   - **Target:** Transit Gateway
-    ![Docker Initialization](13.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/13.png)
   
 
 ---
@@ -1142,7 +1141,7 @@ ping <Private-IP-of-VPC-B-instance>
 
 > 🧠 Use “Peering Connection” as the **attachment type** during TGW setup.
 
-![Docker Initialization](14.png)
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/14.png)
 
 
 ---
