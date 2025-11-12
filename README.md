@@ -1315,7 +1315,7 @@ A **VPC Endpoint** enables a **private connection** between your VPC and **suppo
 1. Go to **VPC → Endpoints → Create Endpoint**
 2. Choose **Type:** AWS Service  
 3. Select the desired **Service** (e.g., S3)
- ![Image](15.png)
+ ![Image](./image/15.png)
 5. Choose your **VPC**
 6. Select **Private Route Table**
 7. Set **Policy:** Full Access
@@ -1350,11 +1350,11 @@ A **VPC Endpoint** enables a **private connection** between your VPC and **suppo
 ### 🔹 Configuration Highlights
 
 * Only the **Endpoint Type** changes → Choose **Interface**
-   ![Image](16.png)
+   ![Image](./image/16.png)
 * Select your **VPC**
 * Enable **DNS Name**
 * Disable **Private DNS for inbound endpoint**
-   ![Image](17.png)
+   ![Image](./image/17.png)
 * Choose **Private Subnet**
 * Select **Security Group** (default or custom)
 * Policy: **Full Access**
@@ -1363,7 +1363,7 @@ After creation:
 
 1. Edit the Endpoint’s **Security Group**  
    → Add **Inbound Rule: HTTPS (443)**
-    ![Image](18.png)
+    ![Image](./image/18.png)
 3. Connect to **Private Server** → Run:
    ```bash
    aws s3 ls
