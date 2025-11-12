@@ -1579,5 +1579,575 @@ Instead of manually entering service IPs, you reference a **Prefix List ID**.
 | **Managed Prefix Lists** | Simplify routing and manage service IP ranges |
 
 ---
+# ☁️ Amazon EC2 — Elastic Compute Cloud
+
+> A complete and simplified guide to **Amazon EC2**, covering software installation, web hosting, AMIs, storage, snapshots, and instance types.
+
+---
+
+## 💡 What is Amazon EC2?
+
+**Amazon EC2 (Elastic Compute Cloud)** is a web service that provides **scalable, on-demand virtual servers** — called **instances** — in the AWS Cloud.
+
+It allows users to deploy applications quickly, scale easily, and pay only for the compute resources they use.
+
+---
+
+## 🧱 Installing Software on EC2
+
+### 🔹 Exercise: Installing Apache HTTP Server
+
+**Apache** is one of the most popular web servers used to host and deliver web content.
+
+- Default web directory:  
+```
+
+/var/www/html
+
+````
+
+---
+
+### ⚙️ Step-by-Step Lab
+
+1. **Launch an EC2 Instance** → Connect to terminal.  
+2. Access root privileges:
+ ```bash
+ sudo su
+````
+
+3. Install Apache:
+
+   ```bash
+   yum install httpd -y
+   ```
+4. Check Apache status:
+
+   ```bash
+   systemctl status httpd
+   ```
+   ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/dead.png)
+5. If it’s inactive (dead), start the service:
+
+   ```bash
+   systemctl start httpd
+   ```
+   ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/run.png)
+6. Copy your **Public IP** and paste it into a browser to test.
+
+   * HTTP → Port **80**
+   * HTTPS → Port **443**
+7. If not accessible:
+
+   * Edit **Security Group** → Add **HTTP (Port 80)** to **Inbound Rules**.
+      ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/19.png)
+8. To remove Apache:
+
+   ```bash
+   yum remove httpd -y
+   ```
+
+✅ Apache is now installed and running on your EC2 instance!
+
+---
+
+## 🌐 Host a Custom Website on EC2
+
+1. **Connect** to EC2
+2. **Install Apache**
+3. Navigate to the web directory:
+
+   ```bash
+   cd /var/www/html
+   ```
+4. Create your webpage:
+
+   ```bash
+   sudo vi index.html
+   ```
+
+   Add your HTML code → Save (`:wq`)
+5. Allow **Port 80** in your Security Group
+6. Access:
+
+   ```
+   http://<EC2-Public-IP>
+   ```
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/20.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/21.png)
+  
+---
+
+## 🎨 Import a Custom CSS Template to EC2
+
+1. Download template:
+
+   ```bash
+   wget <link-to-css-template>
+   ```
+
+   > **wget** downloads files from the internet via HTTP/HTTPS/FTP.
+
+2. Extract ZIP file:
+
+   ```bash
+   unzip <file.zip>
+   ```
+
+3. Move contents to web directory:
+
+   ```bash
+   mv * /var/www/html
+   ```
+
+4. Open your EC2 **Public IP** in a browser — the CSS-based website should load.
+
+---
+
+# ⚙️ Using NGINX (Engine-X)
+
+**Nginx** is a high-performance web server, reverse proxy, and load balancer designed for scalability and speed.
+
+* Default directory:
+
+  ```
+  /usr/share/nginx/html
+  ```
+
+---
+
+### 🪜 Install and Run Nginx
+
+1. Install Nginx:
+
+   ```bash
+   yum install nginx -y
+   ```
+2. Start the service:
+
+   ```bash
+   sudo systemctl start nginx
+   ```
+3. Test by visiting your **EC2 Public IP** in a browser.
+
+---
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/22.png)
+
+### 🧩 Add a Custom Website to Nginx
+
+1. Navigate to:
+
+   ```bash
+   cd /usr/share/nginx/html
+   ```
+2. Remove default files:
+
+   ```bash
+   sudo rm -rf *
+   ```
+3. Create new site:
+
+   ```bash
+   sudo vi index.html
+   ```
+4. Add HTML → Save.
+
+---
+
+### 🖼️ Add a Custom Template to Nginx
+
+1. Download template:
+
+   ```bash
+   wget <link-to-template.zip>
+   ```
+2. Extract files:
+
+   ```bash
+   sudo unzip <filename.zip>
+   ```
+3. Remove ZIP:
+
+   ```bash
+   sudo rm -rf <filename.zip>
+   ```
+4. Run your EC2 **Public IP** to test website display.
+
+---
+
+# 🐧 Software Installation in Ubuntu EC2
+
+### 🧾 Basic Details
+
+* **Username:** `ubuntu`
+* **Package Manager:** `apt`
+
+---
+
+### 🪜 Install Apache
+
+```bash
+sudo apt install apache2 -y
+cd /var/www/html
+```
+
+Also install unzip:
+
+```bash
+sudo apt install unzip -y
+```
+
+---
+
+### 🪜 Install Nginx
+
+1. Update system:
+
+   ```bash
+   sudo apt update
+   ```
+2. Install:
+
+   ```bash
+   sudo apt install nginx -y
+   ```
+3. Web directory path:
+
+   ```
+   /var/www/html
+   ```
+
+---
+
+# 🔁 Proxy Concepts
+
+### 🔹 Forward Proxy
+
+* Acts **on behalf of clients**
+* Filters and forwards client requests to the internet
+* Used for **security**, **caching**, and **monitoring**
+
+👉 **Flow:**
+
+```
+Client → Proxy → Internet
+```
+
+---
+
+### 🔹 Reverse Proxy
+
+* Acts **on behalf of servers**
+* Balances load, handles SSL, and hides backend structure
+
+👉 **Flow:**
+
+```
+Client → Reverse Proxy → Web Server
+```
+
+---
+
+# 🪟 Connect EC2 (Windows AMI)
+
+* **Protocol:** RDP (Remote Desktop Protocol)
+* **Authentication:** Uses Key Pair for Password Decryption
+
+---
+
+### 🪜 Steps
+
+1. Select your **Windows Instance** → **Connect**
+2. Go to **RDP Client**
+3. Upload **Key Pair**
+4. Decrypt → Copy generated password
+5. Open the downloaded **RDP file**
+6. Paste decrypted password to connect.
+
+---
+
+## 🌍 Install IIS Web Server (Windows)
+
+1. Open **Server Manager**
+2. Go to **Add Roles and Features**
+3. Choose **Role: IIS Web Server**
+4. Wait for installation
+5. Open browser → Enter EC2 **Public IP**
+6. Default path:
+
+   ```
+   C:\inetpub\wwwroot
+   ```
+7. Use **Notepad** to create:
+
+   ```
+   index.html
+   ```
+
+---
+
+# 🧩 AMI — Amazon Machine Image
+
+### 📘 Definition
+
+A template to launch EC2 instances with:
+
+* OS
+* Applications
+* Configurations
+* EBS Volumes
+
+---
+
+### 🧱 Types of AMIs
+
+1. **AWS-provided**
+2. **Marketplace**
+3. **Custom/Existing**
+
+✅ Used to launch **consistent environments** quickly.
+
+---
+
+## 🔹 1. Existing AMI
+
+* Created from an **existing EC2 instance**
+* Used for:
+
+  * Cloning setup
+  * Scaling
+  * Rollbacks
+
+---
+
+## 🔹 2. Image Builder
+
+AWS service to **automate AMI creation & updates**
+
+**Features:**
+
+* Automates patching & compliance
+* Pipeline for testing and deployment
+
+**Use Case:** Keep AMIs consistent across regions.
+
+---
+
+## 🔹 3. EBS Backup & Snapshots
+
+* **EBS Volume:** Persistent storage for EC2
+* **Snapshot:** Point-in-time backup
+
+  * Incremental
+  * Stored in **S3**
+
+**Use Cases:**
+
+* Data restoration
+* AMI creation
+* Migration
+
+---
+
+## 🔄 AMI Lifecycle
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/24.png)
+
+1. Create EBS snapshot
+2. Register as AMI
+3. Launch new instances
+4. Copy or share AMIs
+5. Deregister when unused
+
+> Command to auto-start Nginx:
+
+```bash
+systemctl enable nginx
+```
+
+---
+
+## 🧠 Create Custom AMI
+
+1. Select **Instance → Actions → Images and Templates → Create Image**
+2. Configure name & settings
+3. Check progress:
+
+   ```
+   EC2 → Images → AMIs
+   ```
+4. Launch a new instance from the AMI
+5. Share via:
+
+   ```
+   AMI → Permissions → Configure ID/OUs
+   ```
+
+---
+
+# 💾 Block Storage in AWS
+
+Stores data in **fixed-size blocks**, offering **low-latency** performance for EC2.
+
+---
+
+## 📦 1. Instance Storage (Ephemeral)
+
+* Temporary & attached to host
+* High-speed
+* Data lost on stop/terminate
+* Use for cache/temp data
+
+---
+
+## 📦 2. Elastic Block Store (EBS)
+
+* Persistent & network-attached
+* Retains data after reboot
+* Can attach/detach to multiple instances
+* Supports **snapshots**
+
+---
+
+### ⚙️ Types of EBS Volumes
+
+#### 🧠 SSD (Solid State Drives)
+
+| Type        | Use Case                        |
+| ----------- | ------------------------------- |
+| **gp3/gp2** | General workloads, boot volumes |
+| **io2/io1** | High IOPS, mission-critical DBs |
+
+#### 💽 HDD (Hard Disk Drives)
+
+| Type    | Use Case               |
+| ------- | ---------------------- |
+| **st1** | Big data, streaming    |
+| **sc1** | Cold storage, low-cost |
+
+---
+
+# 🧪 Lab: Attach & Mount a New EBS Volume
+
+### 🪜 Steps
+
+1. EC2 → **Elastic Block Store → Volumes**
+2. Create & configure volume
+3. **Attach** to instance → Same region
+4. Connect via terminal
+
+Check devices:
+
+```bash
+lsblk
+```
+
+---
+
+### 🧱 Mounting Process
+
+1. Check filesystem:
+
+   ```bash
+   sudo file -s /dev/xvdb
+   ```
+2. Format disk:
+
+   ```bash
+   sudo mkfs -t ext4 /dev/xvdb
+   ```
+3. Mount volume:
+
+   ```bash
+   sudo mount /dev/xvdb /mnt/mountpoint
+   ```
+4. Verify mount:
+
+   ```bash
+   lsblk
+   ```
+
+---
+
+### 🗂️ Permanent Mount
+
+1. Remount after reboot:
+
+   ```bash
+   sudo mount /dev/xvdb /mnt/mountpoint
+   ```
+2. Edit `/etc/fstab`:
+
+   ```
+   /dev/xvdb /mnt/mountpoint ext4 defaults,nofail 0 2
+   ```
+
+✅ Mounts automatically on startup.
+
+---
+
+# 📸 EBS Snapshots
+
+### 🔹 Definition
+
+A **point-in-time backup** of an EBS volume — used for restore or replication.
+
+**Features:**
+
+* Incremental
+* Stored in **S3**
+* Cross-region support
+* Automated backups via Lifecycle Policies
+
+---
+
+### 🧭 Snapshot Tutorial
+
+1. Select **Volume → Actions → Create Snapshot**
+2. Check **EC2 → Snapshots**
+3. Create **Volume from Snapshot**
+4. Mount it using:
+
+   ```bash
+   sudo mount -t xfs -o nouuid /dev/xvdb1 /mnt/mount
+   ```
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/23.png)
+> **UUID:** Universally Unique Identifier for disks/filesystems
+
+---
+
+# ⚙️ Amazon EC2 Instance Types
+
+| Type                       | Example | Description                   |
+| -------------------------- | ------- | ----------------------------- |
+| **General Purpose**        | t3, m5  | Balanced CPU & memory         |
+| **Compute Optimized**      | c5      | High CPU, compute-heavy tasks |
+| **Memory Optimized**       | r5      | Large memory for databases    |
+| **Storage Optimized**      | i3, d2  | High I/O performance          |
+| **Accelerated Computing**  | p3, g4  | GPU-powered for AI/ML         |
+| **High Performance (HPC)** | hpc6id  | Supercomputing workloads      |
+
+---
+
+## 🧩 EC2 Instance Naming Convention
+
+Format:
+
+```
+<family><generation><features>.<size>
+```
+
+### Examples:
+
+| Instance         | Meaning                              |
+| ---------------- | ------------------------------------ |
+| **t2.micro**     | General Purpose, 2nd Gen, small size |
+| **c5.large**     | Compute Optimized, 5th Gen, mid-size |
+| **r6g.xlarge**   | Memory Optimized, 6th Gen (Graviton) |
+| **i3.2xlarge**   | Storage Optimized, 3rd Gen           |
+| **g4dn.4xlarge** | GPU-based, 4th Gen with NVIDIA GPU   |
+
+---
+
+
 
 
