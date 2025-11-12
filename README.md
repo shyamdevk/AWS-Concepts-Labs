@@ -1232,6 +1232,368 @@ ping <Mumbai-private-server-IP>
 > 🚀 **Pro Tip:**
 > Transit Gateway is like AWS’s **network backbone** — build once, and it scales to thousands of VPCs effortlessly.
 
+# 🧩 AWS VPC Endpoints, Flow Logs, DNS Firewall & Managed Prefix Lists
+
+> A complete guide covering **VPC Endpoints**, **VPC Flow Logs**, **DNS Firewall**, and **AWS Managed Prefix Lists** — simplified for learning and documentation.
+
+---
+
+## 🌐 VPC Endpoints
+
+### 🧠 Definition
+
+A **VPC Endpoint** enables a **private connection** between your VPC and **supported AWS services** (like S3, DynamoDB, etc.) — without needing:
+
+- Internet Gateway (IGW)
+- NAT Gateway
+- VPN
+- AWS Direct Connect
+
+> ✅ All traffic stays **within the AWS network**, ensuring higher security and lower cost.
+
+---
+
+### 🌟 Benefits
+
+| Feature | Description |
+|----------|--------------|
+| **Security** | No exposure to the public internet |
+| **Cost** | Avoid NAT/IGW data transfer charges |
+| **Performance** | Lower latency & higher reliability |
+
+---
+
+### 🔁 Example Traffic Flow
+
+| Without Endpoint | With Endpoint |
+|-------------------|----------------|
+| EC2 → Internet Gateway/NAT → Internet → S3 | EC2 → VPC Endpoint → S3 (Private AWS Network) |
+
+---
+
+## 🔸 Types of VPC Endpoints
+
+### 1️⃣ Interface Endpoint
+- Powered by **AWS PrivateLink**
+- Creates an **ENI (Elastic Network Interface)** with a private IP inside your subnet
+- Used for most AWS services (e.g., **CloudWatch**, **KMS**, **Secrets Manager**)
+
+---
+
+### 2️⃣ Gateway Endpoint
+- Adds an entry in **Route Tables**
+- Used only for **Amazon S3** and **DynamoDB**
+
+---
+
+### 3️⃣ Gateway Load Balancer Endpoint (GWLBe)
+- Connects VPC traffic to **third-party network appliances** (e.g., firewalls, IDS/IPS)
+- Ideal for **security and traffic inspection**
+
+---
+
+### 4️⃣ Resource Endpoint
+- Exposes a **specific resource** privately to another VPC
+- Example: Share one **RDS Database** or **EC2 instance** across VPCs securely
+
+---
+
+### 5️⃣ Service Network Endpoint
+- Connects **multiple VPCs** to a **Service Network** via PrivateLink
+- Useful when multiple VPCs need access to the same services centrally
+
+---
+
+# 🧭 Tutorial: VPC Endpoints (Gateway Type)
+
+### 🪜 Step 1 — Launch a VPC
+- Create a VPC using **VPC → VPC and More**
+
+---
+
+### 🪜 Step 2 — Configure Endpoint
+1. Go to **VPC → Endpoints → Create Endpoint**
+2. Choose **Type:** AWS Service  
+3. Select the desired **Service** (e.g., S3)
+4. Choose your **VPC**
+5. Select **Private Route Table**
+6. Set **Policy:** Full Access
+
+---
+
+### 🪜 Step 3 — Launch EC2 Instances
+- Launch 2 EC2 Instances:  
+  - **Jump Server** (Public Subnet)  
+  - **Private Server** (Private Subnet)
+
+---
+
+### 🪜 Step 4 — Attach Role to Private Server
+1. Go to **EC2 → Actions → Security → Modify IAM Role**
+2. Choose **Create New Role**
+3. Use Case → **EC2**
+4. Permission → **S3 Full Access**
+
+---
+
+### 🪜 Step 5 — Verify Connection
+1. Create an **S3 Bucket**
+2. Connect:
+   - Jump Server → Private Server
+3. Run command:
+   ```bash
+   aws s3 ls
+````
+
+✅ Lists all existing S3 buckets using private connection.
+
+---
+
+## 💠 Using Interface Endpoint
+
+### Differences:
+
+* Only the **Endpoint Type** changes → Choose **Interface**
+* Select your VPC
+* Enable **DNS Name**
+* Disable **Private DNS for inbound endpoint**
+* Choose **Private Subnet**
+* Select **Security Group** (default or custom)
+* Policy: **Full Access**
+
+After creation:
+
+1. Edit the Endpoint’s Security Group
+   → Add **Inbound Rule: HTTPS (443)**
+2. Connect to Private Server → Run:
+
+   ```bash
+   aws s3 ls
+   ```
+
+✅ Displays all buckets via Interface Endpoint.
+
+---
+
+# 🧾 VPC Flow Logs
+
+### 🧠 Definition
+
+**VPC Flow Logs** capture metadata about **IP traffic** to and from network interfaces in your VPC.
+
+They record:
+
+* Source/Destination IPs
+* Ports
+* Protocols
+* Actions (ACCEPT / REJECT)
+* Bytes transferred
+
+Logs are stored in **CloudWatch Logs** or **S3** for later analysis.
+
+---
+
+### 💡 Use Cases
+
+| Purpose               | Description                     |
+| --------------------- | ------------------------------- |
+| **Security Analysis** | Detect suspicious connections   |
+| **Troubleshooting**   | Diagnose why traffic is failing |
+| **Monitoring**        | Track allowed/denied patterns   |
+
+✅ In short:
+
+> **VPC Flow Logs = Network traffic audit inside your VPC**
+
+---
+
+## 🧭 Tutorial: VPC Flow Logs
+
+### 🪜 Step 1 — Create Flow Logs
+
+1. VPC → Select your VPC
+2. Go to **Flow Logs → Create Flow Log**
+3. Configure:
+
+   * Filter (All, Accepted, Rejected)
+   * Interval
+   * Destination (CloudWatch or S3)
+   * Log Format & File Format
+4. Create Flow Log
+
+---
+
+### 🪜 Step 2 — Generate Logs
+
+1. Launch an instance (Jump Server)
+2. Generate traffic:
+
+   ```bash
+   ping google.com
+   ```
+3. Wait a few minutes
+4. Check your **S3 bucket** (or CloudWatch Logs)
+5. Logs (ZIP format) → Extract → View Metadata
+
+---
+
+# 🧱 DNS Firewall (Route 53 Resolver)
+
+### 🧠 Definition
+
+A **DNS Firewall** lets you filter and control **DNS queries** made from within your VPC.
+
+It integrates with **Amazon Route 53 Resolver**, which handles DNS resolution for VPC resources.
+
+---
+
+### 🔹 Features
+
+| Feature                  | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| **Rule-based filtering** | Create allow/alert/block rules                  |
+| **Domain lists**         | Use AWS Managed or Custom lists                 |
+| **Monitoring**           | Logs stored in CloudWatch, S3, or Kinesis       |
+| **Security**             | Blocks malware, phishing, and data exfiltration |
+
+---
+
+### 💡 Use Cases
+
+* **Security:** Block malicious or suspicious domains
+* **Compliance:** Enforce restricted domain access
+* **Control:** Centralize DNS policy management
+
+---
+
+## 🧭 Tutorial: DNS Firewall
+
+### 🪜 Step 1 — Create DNS Domain List
+
+1. Go to **VPC → DNS Firewall → Domain Lists → Add Domain List**
+2. Enter domains to block/allow (e.g., `google.com`)
+
+---
+
+### 🪜 Step 2 — Create Rule Group
+
+* Navigate to **VPC → DNS Firewall → Rule Groups → Add Rule Group**
+
+---
+
+### 🪜 Step 3 — Add Rules
+
+1. Open Rule Group → **Rules → Add Rule**
+2. Choose:
+
+   * Domain List: Custom or AWS Managed
+   * Action: **Allow / Block / Alert**
+3. Save Rule
+
+---
+
+### 🪜 Step 4 — Associate Rule Group to VPC
+
+1. Open your Rule Group → **Associated VPCs → Associate**
+2. Choose your VPC → Confirm
+
+---
+
+### 🧪 Verification
+
+On EC2 instance terminal:
+
+```bash
+ping google.com
+```
+
+Result:
+
+```
+ping: google.com: Name or service not known
+client_loop: send disconnect: Connection reset
+```
+
+✅ DNS Firewall successfully blocking traffic.
+
+---
+
+# 📦 AWS Managed Prefix Lists
+
+### 🧠 Definition
+
+**AWS Managed Prefix Lists** are collections of **IP CIDR blocks** (prefixes) managed and updated automatically by AWS.
+
+Used for:
+
+* Route Tables
+* Security Groups
+* NACLs
+
+Instead of managing IPs manually, you can reference a **Prefix List ID**.
+
+---
+
+### 📋 Key Points
+
+| Feature            | Description                                |
+| ------------------ | ------------------------------------------ |
+| **Managed by AWS** | Includes S3, DynamoDB, CloudFront IPs      |
+| **Auto-Updated**   | AWS updates IP ranges automatically        |
+| **Reusable**       | Same list can be used across VPCs/accounts |
+| **Secure**         | Simplifies access control to AWS services  |
+
+---
+
+### 🌟 Benefits
+
+* No manual IP maintenance
+* Consistent across accounts
+* Simplifies route & security configurations
+
+---
+
+## 🧭 Tutorial: AWS Managed Prefix Lists
+
+### 🪜 Step 1 — Create Prefix List
+
+1. Go to **VPC → AWS Managed Prefix Lists → Create Prefix List**
+2. Add:
+
+   * Number of CIDR ranges
+   * Add all ranges in the list
+
+---
+
+### 🪜 Step 2 — Assign Prefix List to Route Table
+
+1. Open your **Route Table**
+2. Add **Prefix List** to **Destination**
+3. Scroll to view your **custom Prefix List**
+4. Save changes
+
+✅ Your Prefix List is now attached to the routing configuration.
+
+---
+
+# 🧠 Summary
+
+| Feature                  | Purpose                                         |
+| ------------------------ | ----------------------------------------------- |
+| **VPC Endpoint**         | Private access to AWS services without internet |
+| **VPC Flow Logs**        | Monitor and analyze VPC traffic                 |
+| **DNS Firewall**         | Control DNS queries and block malicious domains |
+| **Managed Prefix Lists** | Simplify routing and security configurations    |
+
+---
+
+⭐ **End of AWS Networking — Advanced Topics**
+
+> “Private connections, monitored networks, and centralized control — that’s the power of AWS VPC networking.”
+
+```
+
+
 
 
 
