@@ -1315,9 +1315,10 @@ A **VPC Endpoint** enables a **private connection** between your VPC and **suppo
 1. Go to **VPC → Endpoints → Create Endpoint**
 2. Choose **Type:** AWS Service  
 3. Select the desired **Service** (e.g., S3)
-4. Choose your **VPC**
-5. Select **Private Route Table**
-6. Set **Policy:** Full Access
+ ![Image](15.png)
+5. Choose your **VPC**
+6. Select **Private Route Table**
+7. Set **Policy:** Full Access
 
 ---
 
@@ -1343,63 +1344,58 @@ A **VPC Endpoint** enables a **private connection** between your VPC and **suppo
 3. Run command:
    ```bash
    aws s3 ls
-````
 
-✅ Lists all existing S3 buckets using private connection.
+## ✅ Using Interface Endpoint
 
----
-
-## 💠 Using Interface Endpoint
-
-### Differences:
+### 🔹 Configuration Highlights
 
 * Only the **Endpoint Type** changes → Choose **Interface**
-* Select your VPC
+   ![Image](16.png)
+* Select your **VPC**
 * Enable **DNS Name**
 * Disable **Private DNS for inbound endpoint**
+   ![Image](17.png)
 * Choose **Private Subnet**
 * Select **Security Group** (default or custom)
 * Policy: **Full Access**
 
 After creation:
 
-1. Edit the Endpoint’s Security Group
+1. Edit the Endpoint’s **Security Group**  
    → Add **Inbound Rule: HTTPS (443)**
-2. Connect to Private Server → Run:
-
+    ![Image](18.png)
+3. Connect to **Private Server** → Run:
    ```bash
    aws s3 ls
-   ```
 
-✅ Displays all buckets via Interface Endpoint.
 
----
+✅ Lists all existing S3 buckets using a **private connection** via Interface Endpoint.
+
 
 # 🧾 VPC Flow Logs
 
 ### 🧠 Definition
 
-**VPC Flow Logs** capture metadata about **IP traffic** to and from network interfaces in your VPC.
+**VPC Flow Logs** capture metadata about **IP traffic** going to and from network interfaces in your VPC.
 
 They record:
 
-* Source/Destination IPs
-* Ports
-* Protocols
+* Source & Destination IPs
+* Ports and Protocols
 * Actions (ACCEPT / REJECT)
 * Bytes transferred
 
-Logs are stored in **CloudWatch Logs** or **S3** for later analysis.
+Logs are stored in **CloudWatch Logs** or **S3** for visibility and analysis.
 
 ---
 
 ### 💡 Use Cases
 
-| Purpose               | Description                     |
-| --------------------- | ------------------------------- |
-| **Security Analysis** | Detect suspicious connections   |
-| **Troubleshooting**   | Diagnose why traffic is failing |
-| **Monitoring**        | Track allowed/denied patterns   |
+| Purpose               | Description                               |
+| --------------------- | ----------------------------------------- |
+| **Security Analysis** | Detect unusual or unauthorized traffic    |
+| **Troubleshooting**   | Diagnose connectivity or routing issues   |
+| **Monitoring**        | Track accepted and rejected network flows |
 
 ✅ In short:
 
@@ -1407,86 +1403,85 @@ Logs are stored in **CloudWatch Logs** or **S3** for later analysis.
 
 ---
 
-## 🧭 Tutorial: VPC Flow Logs
+## 🧭 Tutorial: Create and Analyze VPC Flow Logs
 
 ### 🪜 Step 1 — Create Flow Logs
 
-1. VPC → Select your VPC
+1. Open **VPC → Select your VPC**
 2. Go to **Flow Logs → Create Flow Log**
 3. Configure:
 
-   * Filter (All, Accepted, Rejected)
-   * Interval
-   * Destination (CloudWatch or S3)
-   * Log Format & File Format
-4. Create Flow Log
+   * **Filter:** All / Accepted / Rejected
+   * **Interval:** Choose logging interval
+   * **Destination:** CloudWatch or S3
+   * **Log Format & File Format**
+4. Click **Create Flow Log**
 
 ---
 
-### 🪜 Step 2 — Generate Logs
+### 🪜 Step 2 — Generate and View Logs
 
-1. Launch an instance (Jump Server)
-2. Generate traffic:
+1. Launch an EC2 **Jump Server**
+2. Generate network activity:
 
    ```bash
    ping google.com
    ```
 3. Wait a few minutes
-4. Check your **S3 bucket** (or CloudWatch Logs)
-5. Logs (ZIP format) → Extract → View Metadata
+4. Check **S3 bucket** or **CloudWatch Logs**
+5. Extract any `.zip` files and review the log metadata.
 
 ---
 
-# 🧱 DNS Firewall (Route 53 Resolver)
+# 🧱 DNS Firewall (Amazon Route 53 Resolver)
 
 ### 🧠 Definition
 
-A **DNS Firewall** lets you filter and control **DNS queries** made from within your VPC.
-
-It integrates with **Amazon Route 53 Resolver**, which handles DNS resolution for VPC resources.
+The **DNS Firewall** helps you filter and control **DNS queries** originating from your VPC.
+It integrates with **Route 53 Resolver** for internal DNS resolution.
 
 ---
 
-### 🔹 Features
+### 🔹 Key Features
 
-| Feature                  | Description                                     |
-| ------------------------ | ----------------------------------------------- |
-| **Rule-based filtering** | Create allow/alert/block rules                  |
-| **Domain lists**         | Use AWS Managed or Custom lists                 |
-| **Monitoring**           | Logs stored in CloudWatch, S3, or Kinesis       |
-| **Security**             | Blocks malware, phishing, and data exfiltration |
+| Feature                  | Description                                           |
+| ------------------------ | ----------------------------------------------------- |
+| **Rule-based filtering** | Create allow, block, or alert actions for DNS queries |
+| **Domain Lists**         | Use AWS Managed or Custom domain lists                |
+| **Monitoring**           | Send logs to CloudWatch, S3, or Kinesis               |
+| **Protection**           | Blocks malicious or phishing domains automatically    |
 
 ---
 
 ### 💡 Use Cases
 
-* **Security:** Block malicious or suspicious domains
-* **Compliance:** Enforce restricted domain access
-* **Control:** Centralize DNS policy management
+* **Security:** Block suspicious or unwanted domains
+* **Compliance:** Prevent access to restricted domains
+* **Control:** Centralize DNS management for your organization
 
 ---
 
-## 🧭 Tutorial: DNS Firewall
+## 🧭 Tutorial: DNS Firewall Setup
 
-### 🪜 Step 1 — Create DNS Domain List
+### 🪜 Step 1 — Create Domain List
 
-1. Go to **VPC → DNS Firewall → Domain Lists → Add Domain List**
-2. Enter domains to block/allow (e.g., `google.com`)
+* Go to **VPC → DNS Firewall → Domain Lists → Add Domain List**
+* Add domains (e.g., `google.com`, `example.com`)
 
 ---
 
 ### 🪜 Step 2 — Create Rule Group
 
-* Navigate to **VPC → DNS Firewall → Rule Groups → Add Rule Group**
+* Go to **VPC → DNS Firewall → Rule Groups → Add Rule Group**
 
 ---
 
 ### 🪜 Step 3 — Add Rules
 
-1. Open Rule Group → **Rules → Add Rule**
+1. Open the Rule Group → **Rules → Add Rule**
 2. Choose:
 
-   * Domain List: Custom or AWS Managed
+   * Domain List: **Custom** or **AWS Managed**
    * Action: **Allow / Block / Alert**
 3. Save Rule
 
@@ -1495,13 +1490,13 @@ It integrates with **Amazon Route 53 Resolver**, which handles DNS resolution fo
 ### 🪜 Step 4 — Associate Rule Group to VPC
 
 1. Open your Rule Group → **Associated VPCs → Associate**
-2. Choose your VPC → Confirm
+2. Select your target **VPC** → Confirm
 
 ---
 
 ### 🧪 Verification
 
-On EC2 instance terminal:
+On an EC2 instance terminal, run:
 
 ```bash
 ping google.com
@@ -1514,7 +1509,7 @@ ping: google.com: Name or service not known
 client_loop: send disconnect: Connection reset
 ```
 
-✅ DNS Firewall successfully blocking traffic.
+✅ DNS Firewall successfully **blocked the domain**.
 
 ---
 
@@ -1522,82 +1517,68 @@ client_loop: send disconnect: Connection reset
 
 ### 🧠 Definition
 
-**AWS Managed Prefix Lists** are collections of **IP CIDR blocks** (prefixes) managed and updated automatically by AWS.
+**AWS Managed Prefix Lists** are pre-defined, automatically updated lists of **IP CIDR ranges** maintained by AWS.
+They can be used in:
 
-Used for:
+* **Route Tables**
+* **Security Groups**
+* **NACLs**
 
-* Route Tables
-* Security Groups
-* NACLs
-
-Instead of managing IPs manually, you can reference a **Prefix List ID**.
+Instead of manually entering service IPs, you reference a **Prefix List ID**.
 
 ---
 
 ### 📋 Key Points
 
-| Feature            | Description                                |
-| ------------------ | ------------------------------------------ |
-| **Managed by AWS** | Includes S3, DynamoDB, CloudFront IPs      |
-| **Auto-Updated**   | AWS updates IP ranges automatically        |
-| **Reusable**       | Same list can be used across VPCs/accounts |
-| **Secure**         | Simplifies access control to AWS services  |
+| Feature            | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| **Managed by AWS** | Includes IPs for S3, DynamoDB, CloudFront, etc. |
+| **Auto-updated**   | AWS maintains and updates IP ranges             |
+| **Reusable**       | Can be used across multiple VPCs and accounts   |
+| **Secure**         | Simplifies access control to AWS services       |
 
 ---
 
 ### 🌟 Benefits
 
-* No manual IP maintenance
-* Consistent across accounts
-* Simplifies route & security configurations
+* No manual IP updates
+* Consistent configuration across environments
+* Simplified routing and security management
 
 ---
 
 ## 🧭 Tutorial: AWS Managed Prefix Lists
 
-### 🪜 Step 1 — Create Prefix List
+### 🪜 Step 1 — Create a Prefix List
 
-1. Go to **VPC → AWS Managed Prefix Lists → Create Prefix List**
+1. Navigate to **VPC → AWS Managed Prefix Lists → Create Prefix List**
 2. Add:
 
    * Number of CIDR ranges
-   * Add all ranges in the list
+   * List all CIDR blocks you want to include
 
 ---
 
-### 🪜 Step 2 — Assign Prefix List to Route Table
+### 🪜 Step 2 — Attach Prefix List to Route Table
 
 1. Open your **Route Table**
-2. Add **Prefix List** to **Destination**
-3. Scroll to view your **custom Prefix List**
-4. Save changes
+2. Add **Prefix List** as **Destination**
+3. Scroll down to find your **Custom Prefix List**
+4. Save configuration
 
-✅ Your Prefix List is now attached to the routing configuration.
+✅ The Prefix List is now active and can be reused for security rules or routing policies.
 
 ---
 
 # 🧠 Summary
 
-| Feature                  | Purpose                                         |
-| ------------------------ | ----------------------------------------------- |
-| **VPC Endpoint**         | Private access to AWS services without internet |
-| **VPC Flow Logs**        | Monitor and analyze VPC traffic                 |
-| **DNS Firewall**         | Control DNS queries and block malicious domains |
-| **Managed Prefix Lists** | Simplify routing and security configurations    |
+| Feature                  | Purpose                                       |
+| ------------------------ | --------------------------------------------- |
+| **Interface Endpoint**   | Private connection to AWS services using ENIs |
+| **VPC Flow Logs**        | Monitor and audit VPC-level traffic           |
+| **DNS Firewall**         | Filter and control DNS queries                |
+| **Managed Prefix Lists** | Simplify routing and manage service IP ranges |
 
 ---
-
-⭐ **End of AWS Networking — Advanced Topics**
-
-> “Private connections, monitored networks, and centralized control — that’s the power of AWS VPC networking.”
-
-```
-
-
-
-
-
-
-
 
 
