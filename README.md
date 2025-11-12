@@ -1,4 +1,4 @@
-# ☁️ Amazon Web Services (AWS) 
+# ☁️ Amazon Web Services (AWS)
 
 A well-structured guide covering **IAM, Roles, S3, Policies, Encryption, Replication, Lifecycle Rules, and VPC** — simplified for study and quick reference.
 
