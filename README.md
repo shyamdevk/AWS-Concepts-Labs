@@ -2147,6 +2147,408 @@ Format:
 | **g4dn.4xlarge** | GPU-based, 4th Gen with NVIDIA GPU   |
 
 ---
+# ☁️ Amazon EC2 — Advanced Concepts
+
+> A complete, practical guide to **Amazon EC2 advanced configurations**, covering purchasing models, SSH key management, automation, networking, and performance optimization.
+
+---
+
+## 💸 Amazon EC2 Purchasing Options
+
+| Option | Description | Best For |
+|--------|--------------|----------|
+| **1️⃣ On-Demand Instances** | Pay only for what you use. No long-term commitment. | Short-term or unpredictable workloads. |
+| **2️⃣ Reserved Instances (RI)** | Buy for 1 or 3 years at a discounted rate. | Long-term, steady workloads. |
+| **3️⃣ Spot Instances** | Use unused EC2 capacity (up to 90% cheaper). Can be interrupted anytime. | Batch jobs, flexible & fault-tolerant tasks. |
+| **4️⃣ Savings Plans** | Commit to a fixed $/hour usage for 1 or 3 years. Works across EC2, Fargate, Lambda. | Long-term workloads with flexibility. |
+| **5️⃣ Dedicated Hosts** | Entire physical server dedicated to one customer. | Compliance, licensing, and isolation. |
+| **6️⃣ Dedicated Instances** | Runs on isolated hardware (managed by AWS). | When isolation is needed without full control. |
+| **7️⃣ Capacity Reservations** | Reserve capacity in a specific AZ. No long-term contract. | Ensures guaranteed instance availability. |
+
+---
+
+## 🔐 Key Pair & Recovery
+
+A **Key Pair** in AWS consists of a **public key** and **private key** for secure SSH login.
+
+- **Private Key:** Owned by the user.  
+- **Public Key:** Stored inside the instance at  
+```
+
+/home/ec2-user/.ssh/authorized_keys
+
+````
+
+---
+
+### 🧭 Exercise: Recover EC2 When Private Key is Lost (Using a Dummy Server)
+
+1. **Detach** volume from the main instance.  
+2. **Attach** it to a **dummy instance**.
+3. **Mount** main volume:
+ ```bash
+ sudo mount -t xfs -o nouuid /dev/xvdb1 /mnt/mount
+````
+
+4. **Copy authorized_keys:**
+
+   ```bash
+   sudo mv authorized_keys /mnt/mount/home/ec2-user/.ssh/authorized_keys
+   ```
+5. **Detach** main volume → **Reattach** to the main instance (ensure device name = root).
+6. Start instance → Connect using **dummy server’s key-pair**.
+
+✅ The main instance now accepts the dummy server’s key-pair for SSH access.
+
+---
+
+### 🔑 Alternate Method: Generate a New RSA Key Pair
+
+1. Create key pair:
+
+   ```bash
+   ssh-keygen -t rsa
+   ```
+2. Generated files inside `.ssh`:
+
+   * `id_rsa` → Private Key
+   * `id_rsa.pub` → Public Key
+3. Move public key to `authorized_keys`:
+
+   ```bash
+   mv test.pub authorized_keys
+   ```
+4. Convert key to RSA (PEM) format:
+
+   ```bash
+   ssh-keygen -p -m PEM -f test
+   ```
+5. Copy public key → Save to text file → Use it for SSH authentication.
+
+---
+
+# 🐚 Linux Shell Scripting
+
+### 🧠 Shell
+
+A **shell** is a command-line interpreter that interacts with the OS.
+**Examples:** Bash, Zsh, Sh, Ksh.
+
+### ⚙️ Shell Scripting
+
+Writing a series of shell commands in a `.sh` file to automate repetitive tasks.
+
+---
+
+### 🧪 Exercise: Create a Script to Install Apache & Host a Website
+
+1. Create file:
+
+   ```bash
+   vi web.sh
+   ```
+2. Add:
+
+   ```bash
+   #!/bin/bash
+   yum update -y
+   yum install httpd -y
+   systemctl start httpd
+   systemctl enable httpd
+   echo "<h1>Hi From Website</h1>" >> /var/www/html/index.html
+   ```
+3. Give execute permission:
+
+   ```bash
+   chmod 700 web.sh
+   ```
+4. Run script:
+
+   ```bash
+   ./web.sh
+   ```
+
+✅ Automatically installs Apache and hosts a simple web page.
+
+---
+
+# ⚡ User Data in EC2
+
+### 🧠 Definition
+
+**User Data** = A script or command that runs **automatically** when an EC2 instance first boots.
+
+---
+
+### 🪜 Steps
+
+1. During EC2 creation → go to **Advanced Details → User Data**
+2. Add:
+
+   ```bash
+   #!/bin/bash
+   yum update -y
+   yum install httpd -y
+   systemctl start httpd
+   systemctl enable httpd
+   echo "<h1>Hi From Website</h1>" >> /var/www/html/index.html
+   ```
+3. After launch, Apache installs and runs automatically.
+
+---
+
+### 🧹 Updating User Data
+
+* Stop the instance
+* Go to **Actions → Edit User Data**
+* To reload new data:
+
+  ```bash
+  sudo rm -rf /var/lib/cloud/*
+  ```
+
+  Then execute:
+
+  ```bash
+  sudo cloud-init init
+  sudo cloud-init modules --mode=config
+  sudo cloud-init modules --mode=final
+  ```
+
+✅ Clears cache and forces re-run of User Data.
+
+---
+
+# 🌐 Elastic Network Interface (ENI)
+
+### 🧠 Definition
+
+An **ENI** is a virtual network card attached to an EC2 instance.
+
+Each ENI includes:
+
+* Private IP (mandatory)
+* Optional Public/Elastic IP
+* MAC address
+* Security Groups
+
+---
+
+### 🧭 Exercise: Attach an Additional ENI
+
+1. **Instance → Networking → Network Interfaces**
+2. Create new ENI → select **subnet** and **security group**
+3. Actions → **Attach** to instance
+4. Allocate **Elastic IP → Associate → Resource Type: Network Interface**
+5. Confirm instance now has:
+
+   * 2 Private IPs
+   * 1 Public & Elastic IP
+
+> 📝 Note: New ENIs don’t have a public IP unless manually assigned.
+
+---
+
+### 🎯 Assign Custom IP
+
+During instance launch:
+
+> Go to **Network Settings → Advanced Network Configuration → Custom Private IP**
+
+---
+
+# 🌍 Virtual Hosting
+
+### 🧠 Definition
+
+Host **multiple websites** on a **single EC2 instance** (or single IP address).
+
+Two types:
+
+1. **Name-Based Virtual Hosting** — by domain name
+2. **IP-Based Virtual Hosting** — by IP address
+
+---
+
+### 🧭 Exercise: Host 2 Websites Using 2 ENIs
+
+1. Inside `/var/www/html`, create two directories:
+
+   ```
+   web1
+   web2
+   ```
+2. Add separate `index.html` files in each.
+3. Edit config file:
+
+   ```bash
+   vi /etc/httpd/conf/httpd.conf
+   ```
+
+   Add:
+
+   ```html
+   <VirtualHost Private-IP1>
+       DocumentRoot "/var/www/html/web1"
+   </VirtualHost>
+
+   <VirtualHost Private-IP2>
+       DocumentRoot "/var/www/html/web2"
+   </VirtualHost>
+   ```
+    ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/25.png)
+4. Restart Apache:
+
+   ```bash
+   sudo systemctl restart httpd
+   ```
+
+✅ Access both web pages using the respective **Public or Elastic IPs**.
+
+---
+
+# 💻 PuTTY Software
+
+**PuTTY** is a free SSH client for Windows that connects to remote systems via SSH, Telnet, or Rlogin.
+
+### ⚙️ Setup Guide
+
+1. Download **PuTTY** and **PuTTYgen** from the official site.
+2. Convert `.pem` to `.ppk` using PuTTYgen.
+3. In PuTTY:
+
+   * **Session:** Enter Public IP
+   * **SSH → Auth → Credentials:** Browse `.ppk` file
+   * Click **Open**
+
+✅ You’re connected to EC2 from Windows!
+
+---
+
+# 🔒 Session Manager (AWS Systems Manager)
+
+**Session Manager** lets you connect to EC2 **without SSH, key pairs, or open ports**.
+
+---
+
+### ⚙️ Setup Steps
+
+1. Ensure the **SSM Agent** is installed (preinstalled in most AMIs).
+2. Create an IAM Role with:
+
+   ```
+   AmazonSSMManagedInstanceCore
+   ```
+3. Attach IAM role:
+
+   ```
+   Actions → Security → Modify IAM Role
+   ```
+4. Connect:
+
+   ```
+   Instance → Connect → Session Manager → Start Session
+   ```
+
+✅ Secure browser-based shell without SSH keys or open ports.
+
+---
+
+# 🖥️ EC2 Serial Console
+
+### 🧠 Definition
+
+Direct console access to EC2, similar to a **physical server monitor**.
+Works **without the internet** (for troubleshooting system-level issues).
+
+> Supported only on **Nitro-based instances**.
+
+---
+
+### ⚙️ Setup
+
+1. Enable:
+
+   ```
+   EC2 → Settings → EC2 Serial Console → Allow
+   ```
+2. Stop instance → Restart on Nitro Hypervisor
+3. Connect:
+
+   ```
+   Instance → Connect → EC2 Serial Console
+   ```
+4. Log in using **local user credentials** (create via CLI if not set).
+
+---
+
+# ⚙️ Burstable vs Fixed Performance Instances
+
+### 💡 Classification Based on CPU Performance
+
+#### 🔹 Burstable Performance Instances
+
+* Provide **baseline CPU** performance with **credit-based bursting**.
+* Earn CPU credits when idle.
+* Example: `t2`, `t3`, `t3a`, `t4g`
+
+Use for cost efficiency and variable workloads.
+
+---
+
+#### 🔹 Fixed Performance Instances
+
+* Offer **consistent, dedicated CPU** performance.
+* No CPU credits or bursts.
+* Example: `m5`, `m6i`, `c5`, `r5`, `r6i`
+
+Use for predictable workloads needing steady performance.
+
+---
+
+# ⚖️ Load Balancer in AWS
+
+### 🧠 Definition
+
+A **Load Balancer (ELB)** distributes incoming traffic across multiple targets (EC2s, containers, IPs).
+
+---
+
+### 🔹 How It Works
+
+**Flow:**
+
+```
+User → Listener → Routing Rule → Target Group → EC2
+```
+
+**Components:**
+
+* **Listener:** Detects requests (HTTP/HTTPS)
+* **Routing:** Decides target group
+* **Security Group:** Firewall for ELB
+* **Health Checks:** Only routes to healthy targets
+
+---
+
+### 🎯 Purpose
+
+* Improves availability & fault tolerance
+* Increases scalability
+* Routes traffic only to healthy instances
+
+---
+
+## 🧩 Types of Load Balancers
+
+| Type                                   | Layer     | Use Case                                        |
+| -------------------------------------- | --------- | ----------------------------------------------- |
+| **1. Application Load Balancer (ALB)** | Layer 7   | Web apps, microservices (HTTP/HTTPS)            |
+| **2. Network Load Balancer (NLB)**     | Layer 4   | TCP/UDP/TLS, real-time or low-latency apps      |
+| **3. Gateway Load Balancer (GLB)**     | Layer 3   | Integrates with third-party firewalls & IDS/IPS |
+| **4. Classic Load Balancer (CLB)**     | Layer 4/7 | Legacy load balancing (limited features)        |
+
+---
 
 
 
