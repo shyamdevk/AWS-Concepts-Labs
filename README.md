@@ -2550,6 +2550,401 @@ User → Listener → Routing Rule → Target Group → EC2
 
 ---
 
+# ⚖️ Load Balancer (Elastic Load Balancing - ELB)
+
+A **Load Balancer (LB)** automatically distributes incoming network traffic across multiple EC2 instances to ensure high availability and reliability.
+
+---
+
+## 💡 LAB — Create Load Balancer in AWS
+
+**Goal:** Create an **Application Load Balancer (ALB)** to manage traffic between multiple web servers.
+
+### 🪜 Steps:
+
+1. **Launch 2 EC2 Instances**
+   - Deploy simple web pages on both (e.g., Apache with different content).
+
+2. **Create a Target Group**
+   - Go to: `EC2 → Target Groups → Create`
+   - Select **Instances** as the target type.
+   - Configure settings → Register both EC2 instances.
+   - Create the **Target Group**.
+
+3. **Create Load Balancer**
+   - Navigate to: `EC2 → Load Balancers → Create Load Balancer`
+   - Choose **Application Load Balancer**
+   - Select **Internet-facing scheme**
+   - Choose **subnets** and **security group**
+   - Under **Listeners & Routing**, select your **Target Group**
+   - Click **Create**
+
+4. **Test Your Load Balancer**
+   - Copy the **DNS name** of your ALB
+   - Paste it in the browser:
+     - It will load **one website**, and when refreshed, switch to the **other instance**.
+
+✅ Ensure **HTTP (Port 80)** is allowed in the Load Balancer’s security group.
+
+---
+
+# ⚙️ Auto Scaling in AWS
+
+### 🧠 Definition
+**Auto Scaling** automatically adjusts the number of EC2 instances according to demand, ensuring consistent performance and cost optimization.
+
+---
+
+## 🔹 Types of Scaling
+
+### 1️⃣ Horizontal Scaling (Scale Out/In)
+- Adds or removes **instances** based on demand.  
+  Example:
+  - Traffic ↑ → Add EC2s  
+  - Traffic ↓ → Remove EC2s
+
+### 2️⃣ Vertical Scaling (Scale Up/Down)
+- Changes **instance size** to increase/decrease performance.  
+  Example:
+  - Upgrade `t2.micro → t2.large`
+
+---
+
+# 🧩 Auto Scaling Group (ASG)
+
+An **ASG** manages a group of EC2 instances collectively. It automatically maintains the desired instance count.
+
+### ⚙️ Capacity Settings
+
+| Setting | Description |
+|----------|--------------|
+| **Minimum Capacity** | Minimum number of instances always running |
+| **Maximum Capacity** | Maximum limit of instances allowed |
+| **Desired Capacity** | Normal (target) number of running instances |
+
+---
+
+# 🧱 Launch Template (LT)
+
+A **Launch Template** defines configuration details for instances launched by Auto Scaling.
+
+### 📦 Launch Template Includes:
+
+- AMI (Amazon Machine Image)
+- Instance Type (e.g., `t2.micro`)
+- Key Pair (SSH access)
+- Security Groups
+- User Data (startup scripts)
+- EBS Storage configuration
+- IAM Role (permissions)
+
+---
+
+## 💡 LAB 1 — Create an Auto Scaling Group
+
+### 🪜 Steps:
+
+1. **Create a Launch Template**
+   - `EC2 → Launch Templates → Create`
+   - Add instance configuration (AMI, SG, Key Pair, etc.)
+
+2. **Create Auto Scaling Group**
+   - `EC2 → Auto Scaling Groups → Create`
+   - Select Launch Template
+   - Configure network/subnets
+   - Define **Min, Max, Desired** capacity
+   - Add notifications or tags (optional)
+   - Create group
+
+3. **Observe Activity**
+   - View **Activity tab** to see scaling actions
+   - If one instance stops, a new one is launched automatically.
+
+4. **Manual Scaling**
+   - `ASG → Edit → Capacity Overview`
+   - Adjust instance count manually.
+
+---
+
+## 💡 LAB 1.1 — Integrate Load Balancer with Auto Scaling
+
+1. Open ASG → **Integration tab**
+2. Add or create a **Load Balancer**
+3. Choose **Internet-Facing** scheme
+4. Create/attach a **Target Group**
+5. Allow **Port 80** (HTTP) in the security group.
+
+✅ ASG now routes traffic through the Load Balancer and maintains availability.
+
+---
+
+# 🧾 Launch Configuration vs Launch Template
+
+| Feature | Launch Configuration | Launch Template |
+|----------|----------------------|-----------------|
+| Versioning | ❌ Not supported | ✅ Supported |
+| Reusability | Single-use | Multi-version |
+| Network Interfaces | Limited | Full control |
+| Security Group Updates | Manual recreation | Seamless version update |
+| User Data | Basic | Advanced (scripts, parameters) |
+
+---
+
+## 🧪 Exercise — Modify Launch Template with Load Balancer
+
+1. Create **Launch Template**
+2. Launch **Load Balancer** using the template
+3. Edit template:
+   - `Actions → Modify → Create New Version`
+4. Update version in **Load Balancer**
+5. Relaunch instances → Apply new version settings.
+
+---
+
+# 📊 Auto Scaling Policies
+
+**Scaling Policies** define *when and how* ASG adds/removes EC2 instances.
+
+---
+
+## 🔸 1. Dynamic Scaling Policy
+- Based on **CloudWatch metrics** (e.g., CPU > 80%)
+- Automatically adds/removes instances
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/27.png)
+---
+
+## 🔸 2. Predictive Scaling Policy
+- Uses **machine learning** to forecast traffic
+- Scales ahead of time
+- Example: Adds instances every morning before peak hours
+
+---
+
+## 🔸 3. Scheduled Scaling Policy
+- You manually set fixed times for scaling
+- Example: Add 5 instances at 9 AM every weekday
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/28.png)
+---
+
+### ✅ Example Flow
+```
+
+CloudWatch monitors CPU → Policy triggers at 80% →
+ASG adds new instances via Launch Template →
+When CPU drops, extra instances are terminated
+
+````
+
+🧠 **Note:** Lab continues with CloudWatch integration.
+
+---
+
+# 🔍 Amazon CloudWatch (Monitoring & Alarms)
+
+### 🧠 Definition
+**CloudWatch** monitors AWS resources and applications in real-time — providing metrics, logs, dashboards, and automated actions.
+
+---
+
+## 🎯 Key Features
+
+| Feature | Description |
+|----------|--------------|
+| **Metrics** | Data points measuring performance (CPU, Network, Disk) |
+| **Alarms** | Trigger actions when thresholds are crossed |
+| **Logs** | Store application/system logs |
+| **Dashboards** | Visual display of metrics |
+| **Events / Rules** | Automated responses to resource changes |
+
+---
+
+## 💡 How CloudWatch Works
+
+1. Collects metrics from AWS services (EC2, RDS, Lambda)
+2. Creates alarms for thresholds
+3. Alarm can:
+   - Send SNS alert  
+   - Trigger Auto Scaling  
+   - Invoke Lambda functions  
+
+---
+
+## 🧪 Example Scenario
+CloudWatch monitors CPU utilization:
+- If CPU > 80% → Alarm activates
+- ASG adds a new EC2 instance
+
+---
+
+# 🧭 LAB — Monitor EC2 with CloudWatch
+
+### 🪜 Steps:
+
+1. Launch EC2 → Enable **Detailed Monitoring**  
+2. Open CloudWatch → Metrics → EC2 → Select your Instance ID  
+3. Choose a metric (e.g., **CPUUtilization**)  
+4. Generate stress:
+   ```bash
+   sudo yum install stress -y
+   stress --cpu 20 --timeout 300
+
+5. Observe CloudWatch → CPU usage spikes in few minutes.
+
+✅ Verified CloudWatch metric collection.
+
+---
+
+# ⚙️ LAB — Target Tracking Policy
+
+**Goal:** Trigger an alarm automatically and scale ASG based on CPU.
+
+### 🪜 Steps:
+
+1. Create Launch Template → Enable **CloudWatch Monitoring**
+2. Launch ASG → Configure **Health Check Period**
+3. Go to ASG → **Automatic Scaling Policy → Create Dynamic Policy**
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/29.png)
+4. A CloudWatch **Alarm** will be automatically created.
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/30.png)
+5. From EC2 CLI, generate load:
+
+   ```bash
+   stress --cpu 60 --timeout 300
+   ```
+6. When CPU > Target (e.g., 50%), the alarm triggers, and a new EC2 instance is added.
+
+✅ Verified automatic scaling response.
+
+---
+
+# 🚨 Amazon CloudWatch Alarm
+
+### 🧠 What is an Alarm?
+
+A **CloudWatch Alarm** monitors a specific metric and triggers actions when the threshold is breached.
+
+---
+
+### 📊 Alarm States
+
+| State                 | Meaning                   |
+| --------------------- | ------------------------- |
+| **OK**                | Everything is normal      |
+| **ALARM**             | Metric crossed threshold  |
+| **INSUFFICIENT DATA** | Not enough data collected |
+
+---
+
+### ⚙️ Alarm Conditions
+
+| Parameter | Example         |
+| --------- | --------------- |
+| Metric    | CPUUtilization  |
+| Statistic | Average         |
+| Operator  | >, <, ≥, ≤      |
+| Threshold | 80              |
+| Period    | Every 5 minutes |
+
+---
+
+## 🧭 LAB — Setup Alarm for EC2 Metric
+
+1. Launch instance → Enable **Detailed Monitoring**
+2. CloudWatch → All Metrics → EC2 → Per-Instance metrics
+3. Select your instance → Metric (CPUUtilization)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/31.png)
+4. Create Alarm → Configure threshold → Skip action
+5. Add details → Create Alarm
+6. Generate stress:
+
+   ```bash
+   stress --cpu 20 --timeout 300
+   ```
+
+✅ Alarm triggers when CPU crosses the defined threshold.
+
+---
+
+# ⚡ Simple Scaling Policy
+
+**Simple Scaling** = One CloudWatch alarm triggers one scaling action.
+
+---
+
+### 🧩 Example Flow
+
+1. Alarm: CPU > 80% → Add 1 instance
+2. Cooldown period (stabilize)
+3. Alarm: CPU < 40% → Remove 1 instance
+
+---
+
+### 🧭 LAB — Simple Scaling
+
+1. Create Launch Template (enable monitoring)
+2. Launch ASG
+3. Create CloudWatch Alarm
+4. Create Policy:
+
+   * `ASG → Edit → Dynamic Scaling Policy`
+   * Link alarm to scale-out action
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/32.png)
+5. Generate stress to trigger alarm:
+
+   ```bash
+   stress --cpu 60 --timeout 300
+   ```
+
+✅ Instance added automatically after alarm triggers.
+
+---
+
+# ⚙️ Step Scaling Policy
+
+**Step Scaling** = Adds or removes instances **gradually**, depending on how much the metric crosses the threshold.
+
+---
+
+### 🧠 Example
+
+| CPU Utilization | Action            |
+| --------------- | ----------------- |
+| >60%            | Add 1 instance    |
+| >80%            | Add 2 instances   |
+| <40%            | Remove 1 instance |
+
+---
+
+### 🧭 LAB — Step Scaling Policy
+
+1. Launch Template → Enable CloudWatch Monitoring
+2. Launch ASG
+3. Create Alarm → Add **SNS Notification Topic (Email)**
+
+   * Subscribe to the topic (check spam folder)
+4. Create Dynamic Policy:
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/33.png)
+   * Step 1 → Add instance if CPU >50%
+   * Step 2 → Add another instance if CPU >60%
+
+✅ ASG scales stepwise according to CPU load.
+
+---
+
+# 🌩️ Summary
+
+| Feature                | Purpose                                       |
+| ---------------------- | --------------------------------------------- |
+| **Load Balancer**      | Distributes traffic across EC2 instances      |
+| **Auto Scaling Group** | Automatically manages instance count          |
+| **Launch Template**    | Predefined EC2 configuration for ASG          |
+| **Scaling Policies**   | Define when/how scaling occurs                |
+| **CloudWatch**         | Monitors metrics and triggers scaling actions |
+
+---
+
+
+
 
 
 
