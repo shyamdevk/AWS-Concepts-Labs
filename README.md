@@ -3404,13 +3404,146 @@ Amazon SNS is a powerful service that supports both **application-to-application
 
 ---
 
-If you want, I can also generate:
+# **LAB 2 – AWS SNS & CloudWatch Alarm**
 
-✅ Architecture diagram
-✅ Flowchart
-✅ Step-by-step screenshots (explainable)
-✅ A YAML/CLI version using AWS CLI
-Just tell me!
+### **Send an SNS Email Notification When EC2 CPU Utilization Exceeds 50%**
+
+This lab demonstrates how to configure **Amazon SNS** and **CloudWatch Alarms** to notify an end user when an **EC2 instance’s CPU Utilization goes above 50%**.
+
+---
+
+## ## 📌 **Overview**
+
+You will learn how to:
+
+1. Create an **SNS Topic**
+2. Create an **SNS Subscription** (Email Notification)
+3. Launch an **EC2 Instance with Detailed Monitoring**
+4. Configure a **CloudWatch Alarm**
+5. Automatically send an **Email alert** when CPU > 50%
+
+---
+
+# ## ✅ **Step 1: Create an SNS Topic**
+
+1. Go to **AWS Console → SNS → Topics**
+2. Click **Create Topic**
+3. Choose **Standard** type
+
+   * Standard = high throughput, immediate delivery
+4. Enter a **Topic Name** (Example: `EC2-CPU-Alerts`)
+5. Leave all defaults
+6. Click **Create Topic**
+
+This topic acts as the **channel** where CloudWatch will publish alerts.
+
+---
+
+# ## ✅ **Step 2: Create a Subscription (Email)**
+
+1. Open the SNS Topic you created
+2. Click **Create Subscription**
+3. Select:
+
+   * **Protocol:** Email
+   * **Endpoint:** Your Email Address
+4. Click **Create Subscription**
+
+### ⚠️ Confirm Subscription
+
+* You will receive an email from *AWS Notifications*
+* Open it and click **Confirm Subscription**
+* Status becomes **Confirmed** (not Pending)
+
+This ensures SNS can send alerts to your email.
+
+---
+
+# ## ✅ **Step 3: Launch an EC2 Instance with Detailed Monitoring**
+
+1. Go to **EC2 → Instances → Launch Instance**
+2. Select any Amazon Linux/Ubuntu AMI
+3. Choose instance type (t2.micro is fine)
+4. Under **Monitoring**:
+
+   * Enable **Detailed Monitoring** (1-minute metrics)
+5. Configure storage, security group, key pair
+6. Launch the instance
+
+### Why enable Detailed Monitoring?
+
+* CloudWatch basic monitoring = 5-minute intervals
+* Detailed monitoring = 1-minute intervals
+* Faster alarm triggers
+
+---
+
+# ## ✅ **Step 4: Create a CloudWatch Alarm for CPU Utilization**
+
+1. Go to **CloudWatch → Alarms → Create Alarm**
+2. Click **Select Metric**
+3. Choose:
+
+   * **EC2 → Per-Instance Metrics**
+   * Select **CPUUtilization**
+   * Choose your EC2 instance
+4. Click **Select Metric**
+
+### Configure the Alarm Condition
+
+5. Set the **Threshold type**: Static
+6. Set the threshold:
+
+   * **Greater than 50%**
+7. Set **Period** to 1 minute (works well with detailed monitoring)
+
+### Configure Notification
+
+8. In **Notification Settings:**
+
+   * Choose: **In Alarm**
+   * Select the **SNS Topic** you created earlier (EC2-CPU-Alerts)
+
+This means whenever CPU > 50%, CloudWatch will publish an alert to SNS.
+
+---
+
+# ## ✅ **Step 5: Create and Test the Alarm**
+
+1. Review the settings
+2. Click **Create Alarm**
+
+### Testing the Alarm
+
+To trigger CPU > 50%, you can SSH into the EC2 instance and run:
+
+```bash
+sudo yum install stress -y
+stress --cpu 2
+```
+
+After a short period:
+
+* CPU rises above 50%
+* Alarm enters **ALARM** state
+* CloudWatch sends the event to SNS
+* SNS sends an **email notification** to your inbox
+
+---
+
+# ## 🎉 **Result**
+
+Whenever your EC2 instance’s CPU exceeds **50%**, you will receive a **real-time email alert** through AWS SNS.
+
+This lab helps you understand:
+
+* SNS Topics and subscriptions
+* CloudWatch alarms
+* Automated notifications
+* Monitoring EC2 instances effectively
+
+---
+
 
 
 
