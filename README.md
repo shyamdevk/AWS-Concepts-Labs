@@ -3675,6 +3675,110 @@ RDS removes the burden of:
 AWS automates these tasks so you focus on **application development**.
 
 ---
+# 📘 Exercise: Create a Database on EC2, Create a Table & Insert Data (MySQL)
+
+This guide walks you through launching an EC2 instance, installing MySQL, creating a database, creating a table, and inserting sample data. A sample output screenshot is also included.
+
+---
+
+## 🚀 **Step 1: Launch an EC2 Instance**
+
+* Choose **Ubuntu Server AMI** (24.04 or similar).
+* Select instance type (t2.micro free tier).
+* Configure storage & security group (allow SSH: port 22).
+* Launch instance and SSH into it.
+
+---
+
+## 🛠️ **Step 2: Install MySQL Server on Ubuntu**
+
+Update system:
+
+```bash
+sudo apt update
+```
+
+Install MySQL:
+
+```bash
+sudo apt install mysql-server
+```
+
+Start MySQL shell:
+
+```bash
+sudo mysql
+```
+
+---
+
+## 🗄️ **Step 3: Create a Database**
+
+View existing databases:
+
+```sql
+SHOW DATABASES;
+```
+
+Create new DB:
+
+```sql
+CREATE DATABASE mydb;
+```
+
+Use the new DB:
+
+```sql
+USE mydb;
+```
+
+---
+
+## 🧱 **Step 4: Create a Table**
+
+```sql
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    course VARCHAR(50)
+);
+```
+
+---
+
+## 📥 **Step 5: Insert Sample Data**
+
+```sql
+INSERT INTO students (name, course) VALUES
+('Rahul', 'DevOps'),
+('Ananya', 'Cybersecurity'),
+('John', 'Cloud');
+```
+
+---
+
+## 📤 **Step 6: View Table Contents**
+
+```sql
+SELECT * FROM students;
+```
+
+### ✔ Sample Output:
+
+![Sample Output](/mnt/data/Screenshot 2025-11-18 130006.png)
+
+---
+
+## 🎉 Task Completed!
+
+You have successfully:
+
+* Launched an EC2 instance
+* Installed MySQL
+* Created a database
+* Created a table
+* Inserted multiple rows
+* Retrieved data from the table
 
 
 
