@@ -3544,6 +3544,140 @@ This lab helps you understand:
 
 ---
 
+# **Amazon RDS (Relational Database Service)**
+
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/rds.png)
+
+---
+
+## ## 📌 **Overview**
+
+**Amazon RDS** is a **fully managed relational database service** provided by AWS.
+It simplifies the process of **setting up, operating, and scaling** databases in the cloud by handling the heavy lifting such as **backups, patching, monitoring, and high availability**.
+
+AWS manages the infrastructure so developers can focus on **application logic**, not database administration.
+
+---
+
+# ## 🚀 **Why Use Amazon RDS? (Benefits)**
+
+### **1️⃣ Fully Managed Service**
+
+AWS automatically handles:
+
+* Backups
+* Patching
+* Monitoring
+* Hardware provisioning
+* Failover
+
+### **2️⃣ Automated Backups**
+
+Supports **daily automatic backups** + **point-in-time recovery** to restore any moment within a retention period.
+
+### **3️⃣ High Availability (Multi-AZ)**
+
+* RDS automatically maintains a **standby replica** in another AZ.
+* On failure, it performs **automatic failover**.
+* Zero manual intervention.
+
+### **4️⃣ Read Replicas**
+
+* Used for **high read performance**.
+* Offload read queries from the primary database.
+* Available for MySQL, MariaDB, PostgreSQL, and Aurora.
+
+### **5️⃣ Scalable**
+
+* Scale **compute** (CPU/RAM) in minutes
+* Scale **storage** (SSD/HDD) automatically or manually
+* Support for **auto-scaling storage**
+
+### **6️⃣ Secure by Design**
+
+* Run inside **Amazon VPC**
+* Encrypted using **KMS**
+* Access control using **IAM** + **Security Groups**
+
+---
+
+# ## 🗂️ **Databases Supported by Amazon RDS**
+
+| Engine                   | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| **MySQL**                | Open-source, widely used relational DB            |
+| **PostgreSQL**           | Advanced open-source DB with rich features        |
+| **MariaDB**              | MySQL-compatible community-driven DB              |
+| **Oracle**               | Commercial enterprise database                    |
+| **Microsoft SQL Server** | Popular enterprise database from Microsoft        |
+| **Amazon Aurora**        | AWS-built, MySQL/PostgreSQL-compatible, 5× faster |
+
+---
+
+# ## ⚙️ **Key Features of AWS RDS**
+
+### 🔹 **Automated Backups**
+
+Enabled by default, supports point-in-time recovery.
+
+### 🔹 **Manual Snapshots**
+
+Your own custom DB snapshots that persist until deleted.
+
+### 🔹 **Multi-AZ Deployment**
+
+For high availability and automatic failover.
+
+### 🔹 **Read Replicas**
+
+Scale read traffic and improve performance.
+
+### 🔹 **Monitoring & Metrics**
+
+* CloudWatch metrics
+* Enhanced Monitoring
+* Performance Insights
+
+### 🔹 **Automatic Software Patching**
+
+Keeps the database engine up to date.
+
+### 🔹 **Parameter Groups & Option Groups**
+
+Customize DB configurations easily.
+
+---
+
+# ## 🎯 **When Should You Use RDS?**
+
+Choose RDS when your application requires a **managed relational database system**, such as:
+
+* Web and Mobile Applications
+* E-commerce Platforms
+* Banking & Financial Systems
+* CRM / ERP Applications
+* Data analytics and reporting
+* Any application requiring ACID transactions
+
+---
+
+# ## 🎉 **Why RDS Compared to EC2 or On-Prem?**
+
+RDS removes the burden of:
+
+* OS installation
+* Database installation
+* Patching
+* Backups
+* Server maintenance
+* High availability setup
+
+AWS automates these tasks so you focus on **application development**.
+
+---
+
+
+
 
 
 
