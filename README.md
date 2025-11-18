@@ -3765,7 +3765,7 @@ SELECT * FROM students;
 
 ### ✔ Sample Output:
 
- ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/31.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/output.png)
 
 ---
 
