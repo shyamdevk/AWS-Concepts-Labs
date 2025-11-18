@@ -3765,7 +3765,7 @@ SELECT * FROM students;
 
 ### ✔ Sample Output:
 
-![Sample Output](/mnt/data/Screenshot 2025-11-18 130006.png)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/31.png)
 
 ---
 
