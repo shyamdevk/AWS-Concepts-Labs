@@ -4094,6 +4094,144 @@ USE testdb;
 | **5** | Connected to DB using endpoint            |
 
 ---
+# 🌐 **Amazon Route 53**
+
+### ✅ **What is Route 53?**
+
+Amazon **Route 53** is a **highly available, scalable, and global DNS (Domain Name System) service** by AWS.
+It helps map **domain names → IP addresses** so users can reach websites and applications.
+
+---
+
+## ⭐ **Key Features**
+
+### 🔹 **1. DNS Service**
+
+* Converts domain name like `example.com` → IP address.
+* Ensures users reach your application correctly.
+
+### 🔹 **2. Domain Registration**
+
+* You can **buy, manage, and transfer** domain names directly from Route 53.
+
+### 🔹 **3. Health Checks**
+
+* Route 53 monitors your application or server.
+* If the main server fails, it automatically routes traffic to a **healthy backup**.
+
+### 🔹 **4. Traffic Routing Policies**
+
+Route 53 can route traffic intelligently using:
+
+| Policy                    | Description                         |
+| ------------------------- | ----------------------------------- |
+| **Simple Routing**        | One record → one server             |
+| **Weighted Routing**      | Split traffic based on weights      |
+| **Latency-based Routing** | Sends user to lowest-latency region |
+| **Failover Routing**      | Primary → Secondary backup          |
+| **Geolocation Routing**   | Based on user’s geographic location |
+
+---
+
+## 📌 **Why the name "Route 53"?**
+
+Because **DNS works on port 53**.
+
+---
+
+## 📝 **Short Note Summary**
+
+**Route 53 = DNS + Domain Registration + Health Checks + Smart Traffic Routing.**
+
+---
+
+<br>
+
+# 🌍 **DNS Resolution Explained**
+
+### 🧠 **What is DNS?**
+
+DNS (Domain Name System) translates domain names like `google.com` into IP addresses like `142.250.78.14`.
+
+It’s basically the **“phonebook of the internet.”**
+
+---
+
+# 🔄 **DNS Resolution Flow (Step-by-Step)**
+
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/dns.png)
+
+### **1️⃣ Browser → Checks Browser Cache**
+
+* You type `www.example.com`
+* Browser checks if the IP is already stored.
+
+---
+
+### **2️⃣ Browser → ISP DNS Resolver**
+
+* If not cached, browser sends query to your **ISP’s DNS Resolver** (like Airtel/Jio resolver).
+
+---
+
+### **3️⃣ ISP DNS Resolver → Local Cache Check**
+
+* Resolver checks its own cache.
+* If no entry → goes to the **Root Server**.
+
+---
+
+### **4️⃣ ISP Resolver → Root Server**
+
+* Root server doesn’t know exact IP.
+* It tells which **TLD server** to ask.
+
+Example:
+`example.com` → go to **.com TLD server**
+
+---
+
+### **5️⃣ TLD Server → Authoritative Name Server**
+
+* TLD server directs resolver to authoritative nameserver for that domain.
+
+---
+
+### **6️⃣ Authoritative Name Server → Returns IP**
+
+* Contains the actual DNS records (A, AAAA, CNAME, MX).
+* Responds with the real **IP address**.
+
+---
+
+### **7️⃣ Resolver → Caches Result**
+
+* Stores the IP temporarily (TTL: Time To Live)
+* Sends IP to browser
+
+---
+
+### **8️⃣ Browser → Connects to Web Server**
+
+* Browser uses IP to load website.
+
+---
+
+# 📘 **Complete Notes Summary**
+
+### **Amazon Route 53**
+
+* Manages domains + DNS + traffic routing
+* Highly available and global
+* Supports advanced routing (failover, weighted, latency)
+
+### **DNS Resolution**
+
+* Browser → DNS Resolver → Root → TLD → Name Server → Browser
+* Caching improves speed
+* DNS makes internet human-friendly
+
+---
 
 
 
