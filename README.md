@@ -4233,6 +4233,298 @@ Example:
 
 ---
 
+# 📘 **AWS Route 53 DNS Mapping Lab (GoDaddy Domain → AWS ALB → EC2)**
+
+This repository contains a detailed step-by-step lab guide for mapping a GoDaddy-purchased domain name to an AWS website hosted on an EC2 instance behind an Application Load Balancer (ALB).
+Finally, HTTPS is enabled using AWS Certificate Manager (ACM).
+
+---
+
+## 🏗 **Architecture Overview**
+
+```
+GoDaddy Domain
+      ↓ (Nameserver Update)
+AWS Route 53 Hosted Zone
+      ↓ (Alias Record)
+Application Load Balancer (ALB)
+      ↓
+EC2 Instance
+      ↓
+Hosted Website
+```
+
+👉 *(Insert final architecture image here)*
+
+---
+
+## 🎯 **Lab Objectives**
+
+* Import a GoDaddy-purchased domain into AWS Route 53
+* Create a Public Hosted Zone
+* Map the domain to an Application Load Balancer
+* Validate domain ownership
+* Issue an SSL certificate using AWS Certificate Manager
+* Enable HTTPS on the Load Balancer
+* Redirect HTTP → HTTPS
+
+---
+
+## 📝 **Prerequisites**
+
+This lab assumes the following steps are already completed:
+
+✔ EC2 instance created
+✔ Website hosted and running
+✔ Application Load Balancer created
+✔ Domain name purchased from GoDaddy
+✔ EC2 added to Target Group → ALB
+
+---
+
+# 🧪 **LAB STEPS**
+
+---
+
+# 🔹 **STEP 1: Create a Public Hosted Zone in Route 53**
+
+1. Open **AWS Console → Route 53 → Hosted zones**
+2. Click **Create hosted zone**
+3. Enter your domain name (same as GoDaddy purchase)
+4. Type: **Public hosted zone**
+5. Click **Create**
+
+Route 53 automatically creates:
+
+* SOA record
+* NS records (Name Servers)
+
+📌 *You will copy these NS values to GoDaddy.*
+
+---
+
+# 🔹 **STEP 2: Update GoDaddy to Use AWS Name Servers**
+
+1. Login to GoDaddy
+2. Navigate to **My Products → Your Domain → Manage DNS**
+3. Scroll to **Nameservers → Change**
+4. Choose **Custom nameservers**
+5. Enter the **4 AWS Route 53 nameservers**
+
+Example:
+
+```
+ns-123.awsdns-45.com
+ns-456.awsdns-78.org
+ns-789.awsdns-12.net
+ns-321.awsdns-90.co.uk
+```
+
+6. Save changes
+7. Wait for DNS propagation (10–60 mins, sometimes 24 hrs)
+
+📌 Your GoDaddy domain is now managed by Route 53.
+
+---
+
+# 🔹 **STEP 3: Get Your Load Balancer DNS Name**
+
+1. Go to **AWS Console → EC2 → Load Balancers**
+2. Select your Application Load Balancer
+3. Copy the **DNS Name**, for example:
+
+```
+myapp-alb-1234567.ap-south-1.elb.amazonaws.com
+```
+
+You will map your domain to this ALB.
+
+---
+
+# 🔹 **STEP 4: Create DNS Records in Route 53**
+
+### ✅ **Record 1: A Record (Alias → ALB)**
+
+**Purpose:** Map `yourdomain.com` to ALB.
+
+1. Open **Route 53 → Hosted zone**
+2. Click **Create record**
+3. Settings:
+
+| Field        | Value           |
+| ------------ | --------------- |
+| Record Name  | *(leave empty)* |
+| Type         | A               |
+| Alias        | Yes             |
+| Alias Target | Choose your ALB |
+
+4. Click **Create Record**
+
+This creates:
+
+```
+yourdomain.com → ALB → EC2 → Website
+```
+
+---
+
+### ✅ **Record 2: CNAME (www → root domain)**
+
+**Purpose:** Allow users to access [www.yourdomain.com](http://www.yourdomain.com).
+
+1. Create a new record
+2. Type: **CNAME**
+3. Name: `www`
+4. Value:
+
+```
+yourdomain.com
+```
+
+5. Save
+
+---
+
+# 🔹 **STEP 5: Request an SSL Certificate in ACM**
+
+### 1. Open **AWS Certificate Manager (ACM)**
+
+Make sure to choose the **same region as ALB**.
+
+### 2. Click **Request Certificate → Request a Public Certificate**
+
+Add:
+
+```
+yourdomain.com
+www.yourdomain.com
+```
+
+Click **Next**
+
+### 3. Validation Method:
+
+✔ **DNS Validation**
+
+Click **Review → Request**
+
+### 4. Add DNS Validation Records
+
+ACM shows CNAME validation records.
+
+Click:
+
+```
+Create records in Route 53
+```
+
+Route 53 automatically adds the validation DNS records.
+
+Status changes:
+
+```
+Pending validation → Issued
+```
+
+---
+
+# 🔹 **STEP 6: Attach SSL Certificate to the Load Balancer**
+
+1. Go to **EC2 → Load Balancers**
+2. Select ALB
+3. Open **Listeners** tab
+4. Click **Add Listener**
+5. Configure:
+
+| Setting        | Value                   |
+| -------------- | ----------------------- |
+| Protocol       | HTTPS                   |
+| Port           | 443                     |
+| Certificate    | Choose ACM certificate  |
+| Default Action | Forward to Target Group |
+
+6. Save
+
+🔒 Your site now supports HTTPS.
+
+---
+
+# 🔹 **STEP 7: Redirect HTTP → HTTPS (Optional but Recommended)**
+
+1. Select **HTTP (80)** listener
+2. Click **Edit**
+3. Change action to:
+
+```
+Redirect to → HTTPS:443
+```
+
+4. Save
+
+Now:
+
+```
+http://yourdomain.com → https://yourdomain.com
+```
+
+---
+
+# 🔹 **STEP 8: Test the Website**
+
+Open:
+
+* ✔ [https://yourdomain.com](https://yourdomain.com)
+* ✔ [https://www.yourdomain.com](https://www.yourdomain.com)
+
+Check:
+
+* SSL padlock visible
+* Correct website loads
+* Redirect works
+
+---
+
+# 🧼 **Cleanup (Optional)**
+
+* Delete Route 53 Hosted Zone
+* Delete ACM certificate
+* Remove DNS records
+* Delete ALB
+* Terminate EC2 instance
+
+---
+
+# 📂 **Repository Structure Suggestion**
+
+```
+📁 aws-route53-dns-mapping-lab
+│── README.md
+│── images/
+│     └── architecture-diagram.png
+│── steps/
+│     └── route53-setup.txt
+│     └── acm-https.txt
+│     └── dns-records.txt
+```
+
+---
+
+# 📄 **Conclusion**
+
+You successfully:
+
+* Imported a GoDaddy domain into Route 53
+* Mapped it to an AWS Application Load Balancer
+* Configured DNS records
+* Validated domain ownership
+* Enabled HTTPS using ACM
+* Redirected all traffic to secure HTTPS
+
+Your domain now loads your EC2-hosted website securely through the ALB.
+
+---
+
+
 
 
 
