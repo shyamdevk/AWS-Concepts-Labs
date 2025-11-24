@@ -1,4 +1,5 @@
 # ☁️ Amazon Web Services (AWS)
+![Docker GIF](aws.gif)
 
 A well-structured guide covering **IAM, Roles, S3, Policies, Encryption, Replication, Lifecycle Rules, and VPC** — simplified for study and quick reference.
 
