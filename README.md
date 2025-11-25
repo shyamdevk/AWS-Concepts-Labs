@@ -4658,6 +4658,124 @@ Controls:
 * Very useful for global websites, APIs, images, videos.
 
 ---
+# 🌐 **AWS CloudFront — Hands-On Lab**
+
+> This lab helps you understand how to deliver content using **AWS CloudFront** with an **Application Load Balancer (ALB)** hosting a sample website on EC2.
+
+---
+
+## 📘 **Lab Overview**
+
+In this lab you will:
+
+1. Launch an EC2 instance with a sample webpage
+2. Create a Load Balancer for the EC2 instance
+3. Create a CloudFront Distribution
+4. Connect CloudFront to the Load Balancer as the Origin
+5. Access your website using the CloudFront global CDN URL
+
+---
+
+# 🏁 **Step 1 — Launch EC2 Instance With Sample Webpage**
+
+Use the following **User Data** script when launching EC2:
+
+```bash
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+
+echo "<h1>Welcome to My EC2 Website</h1>" > /var/www/html/index.html
+echo "<p>This website is served through an Application Load Balancer.</p>" >> /var/www/html/index.html
+```
+
+✔ This creates a simple webpage
+✔ Apache starts automatically
+
+---
+
+# 🏗️ **Step 2 — Create an Application Load Balancer (ALB)**
+
+### Follow these steps:
+
+1. Open **EC2 Console → Load Balancers**
+2. Click **Create Load Balancer → Application Load Balancer**
+3. Set:
+
+   * **Scheme:** Internet-facing
+   * **IP type:** IPv4
+4. **Listeners:** HTTP (port 80)
+5. **Availability Zones:** Select at least 2
+6. **Target Group:**
+
+   * Create a new target group
+   * Register your EC2 instance
+
+After creation, open the ALB **DNS name** in your browser to verify the website loads.
+
+---
+
+# 🌍 **Step 3 — Create CloudFront Distribution**
+
+### Steps:
+
+1. Open **CloudFront Console**
+2. Click **Create Distribution**
+3. In **Origin Domain**, choose your **Load Balancer**
+4. Keep **viewer protocol policy** as:
+
+   ```
+   Redirect HTTP to HTTPS  (recommended)
+   ```
+
+   If your ALB does not support HTTPS yet → you can change this later.
+
+---
+
+# 🎛️ **Step 4 — (Optional Fix) Edit Origin Settings**
+
+If your Load Balancer only supports **HTTP**, CloudFront HTTPS may fail.
+
+To fix this:
+
+1. Open the Distribution
+2. Go to **Origins → Edit**
+3. Change:
+
+   * **Origin Protocol Policy:** HTTP Only
+4. Save changes
+5. CloudFront will deploy the update (takes 3–5 minutes)
+
+---
+
+# 🔗 **Step 5 — Access Your Website Through CloudFront**
+
+After the distribution status shows **Enabled**, copy the CloudFront domain:
+
+```
+https://d123example.cloudfront.net
+```
+
+Paste it in your browser → your EC2 website will load from **global edge locations**.
+
+🎉 Congratulations!
+You are now serving your website using **AWS CloudFront CDN + Load Balancer + EC2**.
+
+---
+
+# 📝 **Summary**
+
+| Component  | Purpose                              |
+| ---------- | ------------------------------------ |
+| EC2        | Hosts your sample webpage            |
+| ALB        | Distributes traffic across instances |
+| CloudFront | Serves content fast using global CDN |
+
+CloudFront improves performance, caching, scalability, and global delivery.
+
+---
 
 
 
