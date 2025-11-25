@@ -194,6 +194,9 @@ Then go to AWS Console → **Switch Role**
 
 ## 🪣 Amazon S3 (Simple Storage Service)
 
+![AWS GIF](s3.gif)
+
+
 ### ⚙️ Features
 
 * Unlimited storage
@@ -412,6 +415,8 @@ Triggers alerts for:
 ---
 
 ## 🌐 VPC (Virtual Private Cloud)
+
+![AWS GIF](vpc.gif)
 
 A **private, isolated network** inside AWS.
 
@@ -1582,6 +1587,8 @@ Instead of manually entering service IPs, you reference a **Prefix List ID**.
 ---
 # ☁️ Amazon EC2 — Elastic Compute Cloud
 
+![AWS GIF](ec2.gif)
+
 > A complete and simplified guide to **Amazon EC2**, covering software installation, web hosting, AMIs, storage, snapshots, and instance types.
 
 ---
@@ -2742,6 +2749,8 @@ When CPU drops, extra instances are terminated
 
 # 🔍 Amazon CloudWatch (Monitoring & Alarms)
 
+![AWS GIF](cloudwatch.gif)
+
 ### 🧠 Definition
 **CloudWatch** monitors AWS resources and applications in real-time — providing metrics, logs, dashboards, and automated actions.
 
@@ -3195,6 +3204,8 @@ You can add:
 
 # 📢 Amazon SNS (Simple Notification Service) – Complete Guide & Lab Setup
 
+![AWS GIF](sns.gif)
+
 Amazon SNS (Simple Notification Service) is a **fully managed messaging service** that enables applications to send notifications/messages to subscribers instantly and reliably.
 
 ---
@@ -3546,6 +3557,8 @@ This lab helps you understand:
 ---
 
 # **Amazon RDS (Relational Database Service)**
+
+![AWS GIF](rds.gif)
 
  ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/rds.png)
 
@@ -4097,6 +4110,8 @@ USE testdb;
 ---
 # 🌐 **Amazon Route 53**
 
+![AWS GIF](route53.gif)
+
 ### ✅ **What is Route 53?**
 
 Amazon **Route 53** is a **highly available, scalable, and global DNS (Domain Name System) service** by AWS.
@@ -4526,6 +4541,8 @@ Your domain now loads your EC2-hosted website securely through the ALB.
 ---
 
 # 🌐 **AWS CloudFront**
+
+![AWS GIF](cloudfront.gif)
 
 > A simple, clean and beginner-friendly explanation of AWS CloudFront.
 > Suitable for notes, seminars, and GitHub documentation.
