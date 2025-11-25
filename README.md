@@ -4525,6 +4525,140 @@ Your domain now loads your EC2-hosted website securely through the ALB.
 
 ---
 
+# 🌐 **AWS CloudFront**
+
+> A simple, clean and beginner-friendly explanation of AWS CloudFront.
+> Suitable for notes, seminars, and GitHub documentation.
+
+---
+
+## 🚀 **What is AWS CloudFront?**
+
+AWS CloudFront is a **Content Delivery Network (CDN)** service that delivers web content like images, videos, HTML, CSS, JS, and APIs **faster** using a global network of **Edge Locations**.
+
+👉 **CloudFront = Global CDN + Caching + Fast Delivery + Security**
+
+---
+
+## 🗺️ **CloudFront Architecture (Diagram Placeholder)**
+
+*Add your image here*
+
+```
+📌 Place CloudFront architecture diagram here
+```
+
+---
+
+## ⭐ **Why Use CloudFront? (Advantages)**
+
+### ✔ **1. Faster Content Delivery**
+
+Delivers content from the nearest **Edge Location**, reducing latency.
+
+### ✔ **2. Caching Improves Performance**
+
+Caches images, videos, static files → reduces origin server load.
+
+### ✔ **3. High Security**
+
+* HTTPS support
+* AWS Shield (DDoS protection)
+* AWS WAF integration
+* Signed URLs / Cookies
+
+### ✔ **4. Very Cost-Effective**
+
+Less data transferred from S3/EC2 → lower AWS bill.
+
+### ✔ **5. Scalable & Reliable**
+
+Handles millions of requests globally without manual scaling.
+
+---
+
+## 🔧 **How CloudFront Works (Simple Flow)**
+
+*Add your flow diagram here*
+
+```
+User → Edge Location → Cache Hit? → If No → Origin (S3/EC2/ALB) → Cached → User
+```
+
+### 📌 Steps:
+
+1. User requests a file (HTML, image, video, API).
+2. Request goes to nearest **CloudFront Edge Location**.
+3. If cached → returned instantly (**cache hit**).
+4. If not cached → CloudFront fetches from **Origin**.
+5. Caches it → sends to the user.
+
+---
+
+## 🧩 **CloudFront Components**
+
+### 🏢 **1. Distribution**
+
+The main configuration for CloudFront.
+
+### 📦 **2. Origin**
+
+The real backend:
+
+* Amazon **S3**
+* **EC2**
+* **Application Load Balancer**
+* Custom server
+
+### 🌍 **3. Edge Locations**
+
+Global data centers for caching content.
+
+### ⚙ **4. Cache Behavior**
+
+Controls:
+
+* Which files to cache
+* Allowed HTTP methods
+* HTTP vs HTTPS
+* TTL (cache time)
+
+---
+
+## 🔐 **Security Features**
+
+| Feature                         | Purpose                                    |
+| ------------------------------- | ------------------------------------------ |
+| **HTTPS / TLS**                 | Encrypts data                              |
+| **AWS WAF**                     | Blocks attacks (SQLi, XSS, bots)           |
+| **AWS Shield**                  | DDoS protection                            |
+| **Signed URLs**                 | Restrict access to premium/private content |
+| **Origin Access Control (OAC)** | Secure private S3 buckets                  |
+
+---
+
+## 🎯 **Use Cases of CloudFront**
+
+| Use Case             | Example                     |
+| -------------------- | --------------------------- |
+| Website Acceleration | Faster global websites      |
+| Video Streaming      | OTT platforms               |
+| Image Delivery       | E-commerce product images   |
+| API Caching          | Faster API calls            |
+| Secure Delivery      | Paid content, private files |
+
+---
+
+## 📝 **Quick Summary**
+
+* CloudFront is AWS’s **CDN** service.
+* Delivers content quickly using **edge locations**.
+* Supports caching, security, HTTPS, WAF, and signed URLs.
+* Works best with **S3**, **EC2**, **ALB**, **API Gateway**.
+* Very useful for global websites, APIs, images, videos.
+
+---
+
 
 
 
