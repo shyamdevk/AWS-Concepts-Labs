@@ -4793,8 +4793,318 @@ You are now serving your website using **AWS CloudFront CDN + Load Balancer + EC
 CloudFront improves performance, caching, scalability, and global delivery.
 
 ---
+# 🌐 **LAB: Host Static Website on S3 + Deliver via CloudFront (With OAC)**
 
+> This lab teaches you how to host a static website on an **S3 bucket** and deliver it globally using **AWS CloudFront** with **Origin Access Control (OAC)**.
+>
+> Also includes the fix for **CSS, JS, images not loading (403 AccessDenied)** by applying the correct S3 bucket policy.
 
+---
+
+## 📁 **Folder Structure Example**
+
+```
+index.html
+assets/
+   ├── css/
+   └── js/
+images/
+   ├── logo.png
+   └── banner.jpg
+```
+
+---
+
+# 🧪 **STEPS**
+
+---
+
+# ✅ **Step 1 — Create an S3 Bucket**
+
+1. Open **AWS → S3**
+2. Click **Create bucket**
+3. Bucket name: `buckerr989898`
+4. Leave **Block Public Access ON** (required for OAC)
+5. Create bucket
+
+---
+
+# ✅ **Step 2 — Upload Website Files**
+
+Upload:
+
+* `index.html`
+* `assets/` folder
+* `images/` folder
+
+---
+
+# ✅ **Step 3 — Enable Static Website Hosting**
+
+Inside **Bucket → Properties**:
+
+1. Enable **Static website hosting**
+2. Set:
+
+   * Index document: `index.html`
+   * Error document: `index.html` (optional for SPA)
+
+---
+
+# ✅ **Step 4 — Create CloudFront Distribution**
+
+1. Open **CloudFront** → **Create Distribution**
+2. Origin domain → Choose the S3 bucket
+3. **Origin Access Control (OAC)** → *Enable (recommended)*
+4. Create distribution
+
+---
+
+# ✅ **Step 5 — Apply Correct S3 Bucket Policy (Fix CSS/JS/Images 403 Error)**
+
+This policy allows **CloudFront** to load:
+
+✔ index.html
+✔ asset files
+✔ image files
+✔ CSS / JS / PNG / JPG / SVG
+
+### ✔ **Final Working Bucket Policy (OAC)**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontOACAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::buckerr989898/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::526888234336:distribution/EBEJZQVVTMTHA"
+        }
+      }
+    }
+  ]
+}
+```
+
+👉 **This makes everything under the bucket public to CloudFront**, including:
+
+* `assets/css/font-awesome.min.css`
+* `assets/js/*`
+* `images/*`
+
+No need to change any additional permissions.
+
+---
+
+# ✅ **Step 6 — Invalidate CloudFront Cache**
+
+After updating the policy:
+
+1. CloudFront → **Invalidations**
+2. Create **new invalidation**
+3. Enter:
+
+```
+/*
+```
+
+This forces CloudFront to fetch new files.
+
+---
+
+# ✅ **Step 7 — Test the Website**
+
+Open the CloudFront domain:
+
+```
+https://dxxxxxx.cloudfront.net
+```
+
+Now your:
+
+✔ CSS loads
+✔ JS loads
+✔ Images load
+✔ Full website works 🎉
+
+---
+
+# 📌 **Common Issue: Only index.html Loads**
+
+This happens when:
+
+❌ assets/ or images/ folders are private
+❌ wrong bucket policy
+❌ CloudFront not authorized to read objects
+
+The above **OAC bucket policy fixes this 100%**.
+
+---
+
+# 🎉 **Lab Completed Successfully**
+
+You have now hosted a static website on **S3** and delivered it via **CloudFront** with correct permissions.
+
+# 🌐 **LAB: Give CloudFront Access to a Private S3 Bucket & Host Website**
+
+This lab explains **how to host a static website in a PRIVATE S3 bucket** and **allow CloudFront to access it securely using OAC (Origin Access Control)**.
+
+---
+
+## 🧪 **LAB NAME:**
+
+**Host Website on Private S3 Bucket Using CloudFront (OAC)**
+
+---
+
+# ✅ **STEPS**
+
+## **1️⃣ Create an S3 Bucket (Private)**
+
+1. Go to **AWS S3 Console → Create bucket**
+2. Bucket name example:
+
+   ```
+   buckerr989898
+   ```
+3. Keep **Block Public Access = ON** (required for private hosting)
+4. Upload your files:
+
+   * `index.html`
+   * `assets/` folder (CSS/JS)
+   * `images/` folder
+
+---
+
+## **2️⃣ Create CloudFront Distribution**
+
+1. Go to **CloudFront Console**
+2. Click **Create Distribution**
+3. **Origin domain:** Choose your S3 bucket
+4. Under "Origin access":
+
+   * Select **Origin Access Control (Recommended)**
+5. Save → Create distribution.
+
+This makes CloudFront the only allowed service that can read your bucket.
+
+---
+
+## **3️⃣ Apply Bucket Policy to Allow CloudFront Access**
+
+Use the policy below (this is the final working version for your case):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontOACAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::buckerr989898/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::526888234336:distribution/EBEJZQVVTMTHA"
+        }
+      }
+    }
+  ]
+}
+```
+
+### ✔ This policy allows CloudFront to read:
+
+* `index.html`
+* `assets/**`
+* `images/**`
+* Any future files inside the bucket
+
+Because the `/*` wildcard covers **all folders** inside S3.
+
+---
+
+## **4️⃣ Disable S3 Public Access Permissions**
+
+You **must not make your files public manually**.
+
+Leave:
+
+* **Bucket Public Access Block = ON**
+* No public ACLs
+* No public objects
+
+CloudFront → OAC → is responsible for access.
+
+---
+
+## **5️⃣ Invalidate CloudFront Cache**
+
+After uploading new files or updating the policy:
+
+Go to:
+**CloudFront → Invalidations → Create Invalidation → `/*`**
+
+This forces CloudFront to fetch fresh content.
+
+---
+
+## **6️⃣ Test the Website**
+
+Open your CloudFront domain:
+
+```
+https://dxxxxxxxxxxxx.cloudfront.net
+```
+
+Your entire website (HTML + assets + images) will now load even though the S3 bucket is **fully private**.
+
+---
+
+# 📝 **Summary for Notes**
+
+### ✔ Private S3 bucket
+
+Public access is blocked.
+
+### ✔ CloudFront OAC
+
+Securely accesses the bucket on your behalf.
+
+### ✔ Bucket Policy
+
+Allows CloudFront distribution to read all files.
+
+### ✔ CloudFront Domain
+
+Used to load the website.
+
+### ✔ Static Website Hosting
+
+Not required — CloudFront reads objects directly.
+
+---
+
+# 🎉 Final Output
+
+With this configuration:
+
+* Website loads from CloudFront
+* S3 bucket stays **100% private**
+* All folders (`assets/`, `images/`, etc.) work
+* No 403 errors
+
+---
 
 
 
