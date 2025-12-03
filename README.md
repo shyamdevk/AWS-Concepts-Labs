@@ -5680,6 +5680,189 @@ Amazon Linux → docker pull nginx → tag → ECR login → docker push → ECS
 ---
 
 
+# 📘 **AWS SQS**
+
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/sqs.gif)
+---
+
+## 🧭 **What is Amazon SQS?**
+
+**Amazon Simple Queue Service (SQS)** is a **fully managed message queue** service that allows different parts of an application to communicate **asynchronously**.
+
+➡️ **SQS = Temporary storage for messages until a worker processes them**
+
+**Why use it?**
+
+* To **decouple** microservices
+* To **avoid system overload**
+* To **ensure messages are never lost**
+
+---
+
+# 🟦 **Types of SQS Queues**
+
+## 🔹 **1. Standard Queue (Default)**
+
+* Supports **unlimited throughput**
+* **At-least-once delivery**
+* **Best-effort ordering** (not guaranteed)
+* Suitable for high-scale systems
+  ➡️ Use when *ordering is not important*.
+
+## 🔹 **2. FIFO Queue (First-In-First-Out)**
+
+* **Strict ordering** guaranteed
+* **Exactly-once processing**
+* Lower throughput than Standard
+* Supports “**Message Group ID**” for parallel processing
+  ➡️ Use when *order matters* (payments, transactions).
+
+---
+
+# 🚀 **How SQS Works (Simple Flow)**
+
+1️⃣ **Producer sends message → SQS Queue**
+2️⃣ SQS stores the message durably
+3️⃣ **Consumer polls** the queue
+4️⃣ Consumer processes the message
+5️⃣ Consumer **deletes message** from queue
+
+➡️ If not deleted, message becomes visible again after *visibility timeout*.
+
+---
+
+# 🔐 **Important Concepts**
+
+### 📨 **Message**
+
+* Max size: **256 KB**
+* Can be JSON, text, XML, etc.
+
+### ⏲️ **Visibility Timeout**
+
+* Time during which a message stays **hidden** after being read.
+* Prevents multiple workers from processing the same message.
+
+### 📅 **Message Retention**
+
+* How long SQS stores a message (1 min → 14 days).
+
+### 🗳️ **Dead Letter Queue (DLQ)**
+
+Failed messages (not processed after X retries) go into a **DLQ** for debugging.
+
+### 🔁 **Long Polling**
+
+* Waits until a message arrives (reduces empty responses).
+* Cheaper & more efficient.
+
+---
+
+# 🛠️ **Features of SQS**
+
+### ✔️ **Decoupling**
+
+Connect services without direct communication.
+
+### ✔️ **Highly Scalable**
+
+Handles **millions of messages per second** automatically.
+
+### ✔️ **Durable**
+
+Messages stored across **multiple AZs**.
+
+### ✔️ **Secure**
+
+Supports:
+
+* IAM policies
+* KMS encryption
+* Private access via VPC Endpoint
+
+### ✔️ **Fully Managed**
+
+No servers, no maintenance.
+
+---
+
+# 🎯 **When to Use SQS?**
+
+* Microservices communication
+* Order processing systems
+* Video/image processing pipelines
+* Logging & monitoring systems
+* Asynchronous tasks
+* Queue-based batch processing
+
+---
+
+# 🧰 **SQS Basic Commands (AWS CLI)**
+
+```bash
+# Create queue
+aws sqs create-queue --queue-name MyQueue
+
+# List queues
+aws sqs list-queues
+
+# Send message
+aws sqs send-message --queue-url <URL> --message-body "Hello"
+
+# Receive message
+aws sqs receive-message --queue-url <URL>
+
+# Delete message
+aws sqs delete-message --queue-url <URL> --receipt-handle <handle>
+```
+
+---
+
+# 📌 **SQS Pricing (Simple Overview)**
+
+* First **1 million requests free/month**
+* After that pay per request (very cheap)
+* FIFO queues cost slightly more
+
+---
+
+# 🔄 **SNS vs SQS (Interview Notes)**
+
+| Feature       | SNS                  | SQS                    |
+| ------------- | -------------------- | ---------------------- |
+| Type          | Pub/Sub              | Message Queue          |
+| Delivers To   | Multiple subscribers | One consumer at a time |
+| Message Order | No                   | FIFO (optional)        |
+| Use Case      | Broadcast            | Decoupling workers     |
+
+---
+
+# 🧪 **Example Use Case (Simple)**
+
+### 🛍️ **E-commerce Order Workflow**
+
+1. User places an order
+2. Backend sends order message → **SQS**
+3. Worker reads message
+4. Worker processes payment, inventory, email
+5. Message deleted
+
+➡️ System is scalable + reliable.
+
+---
+
+# 📝 **Final Summary**
+
+* SQS = **Scalable message queue**
+* Two types: **Standard** & **FIFO**
+* Key elements: Visibility Timeout, DLQ, Long Polling
+* Ideal for decoupled, async systems
+* Cheap, secure, fault-tolerant
+
+---
+
+
+
 
 
 
