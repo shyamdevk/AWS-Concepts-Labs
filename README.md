@@ -5860,6 +5860,202 @@ aws sqs delete-message --queue-url <URL> --receipt-handle <handle>
 * Cheap, secure, fault-tolerant
 
 ---
+Here is your **clean, simple, decorated `README.md`** for **AWS CORS Notes**, with slightly more explanation where needed — perfect for GitHub or study notes 👇
+
+---
+
+# 🌐 **AWS CORS – Cross-Origin Resource Sharing**
+
+## 📘 **What is CORS?**
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/cors.gif)
+
+**CORS (Cross-Origin Resource Sharing)** is a browser security feature that decides **which websites are allowed to access your AWS resources** (like S3, API Gateway, CloudFront).
+
+👉 If your frontend and backend are on **different domains**, the browser checks CORS.
+
+---
+
+# 🔍 **Why CORS Exists?**
+
+Browsers block requests between different websites to protect users from malicious sites.
+So AWS resources must explicitly say:
+
+> **“Yes, this website is allowed to access me.”**
+
+---
+
+# 🟦 **When Does CORS Trigger?**
+
+CORS is checked when:
+
+* `frontend.com` → calls → `api.com`
+* `localhost:3000` → calls → AWS API Gateway
+* CloudFront → loads image from S3
+* Any **cross-domain** request happens
+
+If CORS is not allowed → browser blocks.
+
+---
+
+# 📌 **Important CORS Concepts**
+
+### **1. Origin**
+
+Origin = Protocol + Domain + Port
+Example:
+
+```
+https://example.com:443
+```
+
+### **2. Access-Control-Allow-Origin**
+
+Specifies **which websites** can access the resource.
+
+Example (allow one site):
+
+```
+Access-Control-Allow-Origin: https://myapp.com
+```
+
+Allow all sites:
+
+```
+Access-Control-Allow-Origin: *
+```
+
+### **3. Access-Control-Allow-Methods**
+
+Allowed HTTP methods:
+
+```
+GET, POST, PUT, DELETE, OPTIONS
+```
+
+### **4. Access-Control-Allow-Headers**
+
+What headers the frontend can send:
+
+```
+Content-Type, Authorization
+```
+
+### **5. Preflight Request**
+
+Before sending actual data, browser sends:
+
+```
+OPTIONS request
+```
+
+to check if the server allows it.
+
+If server responds with proper CORS headers → request continues.
+
+---
+
+# 🛠️ **CORS in AWS Services**
+
+## ✔️ **1. S3 (Static Websites, Images, Files)**
+
+To allow any website to access S3 objects:
+
+```xml
+<CORSRule>
+  <AllowedOrigin>*</AllowedOrigin>
+  <AllowedMethod>GET</AllowedMethod>
+  <AllowedHeader>*</AllowedHeader>
+</CORSRule>
+```
+
+If you want ONLY your site:
+
+```xml
+<CORSRule>
+  <AllowedOrigin>https://mywebsite.com</AllowedOrigin>
+  <AllowedMethod>GET</AllowedMethod>
+  <AllowedHeader>*</AllowedHeader>
+</CORSRule>
+```
+
+---
+
+## ✔️ **2. API Gateway (Frontend → API Calls)**
+
+When frontend calls API Gateway, you must enable CORS.
+
+Typical API Gateway response headers:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET,POST,OPTIONS
+Access-Control-Allow-Headers: Content-Type
+```
+
+API Gateway handles OPTIONS (preflight) automatically if CORS is enabled.
+
+---
+
+## ✔️ **3. CloudFront (CDN for S3/API)**
+
+CloudFront must forward these headers to origin:
+
+```
+Origin
+Access-Control-Request-Headers
+Access-Control-Request-Method
+```
+
+Otherwise CORS fails even if S3/API is configured correctly.
+
+---
+
+# 🎯 **Simple Example to Understand**
+
+### Frontend:
+
+```
+http://localhost:3000
+```
+
+### API (AWS):
+
+```
+https://abc123.execute-api.ap-south-1.amazonaws.com
+```
+
+Since domains are different → Browser blocks by default.
+
+To allow access, API must return:
+
+```
+Access-Control-Allow-Origin: http://localhost:3000
+```
+
+Now browser allows the request.
+
+---
+
+# ⚠️ **Common CORS Errors**
+
+| Error                                     | Meaning                                      |
+| ----------------------------------------- | -------------------------------------------- |
+| **No Access-Control-Allow-Origin header** | CORS not enabled or wrong domain             |
+| **Blocked by CORS policy**                | Browser rejected the request                 |
+| **Preflight request failed (OPTIONS)**    | Backend did not respond correctly to OPTIONS |
+
+---
+
+# 🧠 **Super Simple Summary**
+
+* CORS = Browser permission system
+* AWS services must say **which websites can access them**
+* Used in **API Gateway, S3, CloudFront**
+* Without CORS → Browser blocks request
+* Always configure correct **origin, methods, headers**
+
+---
+
 
 
 
