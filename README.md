@@ -5867,7 +5867,7 @@ Here is your **clean, simple, decorated `README.md`** for **AWS CORS Notes**, wi
 # 🌐 **AWS CORS – Cross-Origin Resource Sharing**
 
 ## 📘 **What is CORS?**
- ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/cors.gif)
+ ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/cors.png)
 
 **CORS (Cross-Origin Resource Sharing)** is a browser security feature that decides **which websites are allowed to access your AWS resources** (like S3, API Gateway, CloudFront).
 
