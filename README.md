@@ -5680,7 +5680,7 @@ Amazon Linux → docker pull nginx → tag → ECR login → docker push → ECS
 ---
 
 
-# 📘 **AWS SQS**
+# 📘 **AWS SQS - Amazon Simple Queue Service **
 
 ![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/sqs.gif)
 ---
