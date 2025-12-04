@@ -6220,6 +6220,105 @@ Create a file named **index.html**:
 ---
 !
 
+## 📘 **VPN in VPC**
+
+A **VPN (Virtual Private Network)** in AWS securely connects your **on-premises datacenter** or **office network** to your **AWS VPC** using encrypted tunnels over the internet.
+This allows both networks to communicate **as if they were within the same private network**.
+
+---
+
+## 🧱 **Key Components**
+
+### **1️⃣ VPC**
+
+Your private network inside AWS.
+
+### **2️⃣ Virtual Private Gateway (VGW)**
+
+* AWS-side VPN endpoint
+* Must be **attached to your VPC**
+
+### **3️⃣ Customer Gateway (CGW)**
+
+* Represents your on-premises router/firewall
+* Requires a **public IP address**
+
+### **4️⃣ VPN Connection**
+
+* Creates the secure IPsec tunnel between CGW ↔ VGW
+* AWS provides **two tunnels** for high availability
+
+---
+
+## 🌐 **How VPN Works (Simple Flow)**
+
+1. Create a **Virtual Private Gateway (VGW)**
+2. Attach the VGW to your **VPC**
+3. Create a **Customer Gateway (CGW)** using your router’s public IP
+4. Create a **VPN Connection** linking VGW and CGW
+5. Download VPN configuration and apply it to your on-prem router
+6. Traffic starts flowing **securely** through encrypted tunnels
+
+---
+
+## 🔑 **Why Use VPN in VPC?**
+
+* Secure communication between **AWS and on-premises**
+* Easy and fast to set up
+* Low cost compared to Direct Connect
+* Provides **hybrid cloud** capability
+
+---
+
+## 🚀 **Types of VPN in AWS**
+
+### **🔹 Site-to-Site VPN**
+
+Connects entire on-prem network to AWS VPC
+(Most commonly used)
+
+### **🔹 Client VPN**
+
+Allows individual users to connect securely from laptops or mobile devices.
+
+### **🔹 AWS CloudHub**
+
+Used to connect multiple branch locations together using AWS.
+
+---
+
+## ✔️ **Benefits**
+
+* Encrypted traffic over internet
+* Two tunnels = High availability
+* Low cost and quick setup
+* Works with most routers
+
+---
+
+## ⚠️ **Limitations**
+
+* Depends on internet reliability
+* Higher latency compared to Direct Connect
+* Throughput limits (~1.25 Gbps)
+
+---
+
+## 📝 **Short Summary for Quick Revision**
+
+```
+VPN in VPC provides a secure, encrypted tunnel between on-premises networks and AWS VPC using a Virtual Private Gateway and Customer Gateway. It enables hybrid cloud connectivity, supports two tunnels for redundancy, and is cost-effective and easy to configure.
+```
+
+---
+
+If you want, I can also prepare:
+✨ A **lab guide (step-by-step)**
+✨ A **diagram explained in markdown**
+✨ Notes for **Direct Connect vs VPN**
+
+Just tell me!
+
 
 
 
