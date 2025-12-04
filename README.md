@@ -6056,6 +6056,170 @@ Now browser allows the request.
 
 ---
 
+# 🧪 **LAB: Access S3 Image Using CORS + Load on Button Click**
+
+## 🎯 **Goal**
+
+Set up an S3 bucket with correct **CORS**, **permissions**, and **public access** so a simple `index.html` file can load an image from S3 **only after pressing a button**.
+
+---
+
+# ✅ **Step 1: Create S3 Bucket**
+
+1. Go to **AWS Console → S3**
+2. Click **Create bucket**
+3. Bucket name:
+
+   ```
+   my-cors-demo-bucket-009
+   ```
+4. Leave all default settings
+5. Click **Create bucket**
+
+---
+
+# ✅ **Step 2: Upload Image**
+
+1. Open the bucket
+2. Click **Upload**
+3. Choose your file, example:
+
+   ```
+   image.png
+   ```
+4. Click **Upload**
+
+---
+
+# ✅ **Step 3: Fix Access Denied (Make Objects Public)**
+
+### 🔹 Turn OFF Block Public Access
+
+Go to:
+
+**Bucket → Permissions → Block Public Access → Edit**
+
+Turn off:
+
+* Block all public access
+* Block public ACLs
+* Block public bucket policies
+
+Save.
+
+---
+
+### 🔹 Add Public Read Bucket Policy
+
+Go to:
+
+**Bucket → Permissions → Bucket Policy → Edit**
+
+Paste:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowPublicRead",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-cors-demo-bucket-009/*"
+    }
+  ]
+}
+```
+
+Save changes.
+
+---
+
+# ✅ **Step 4: Add Correct JSON CORS Configuration**
+
+Go to:
+
+**Bucket → Permissions → CORS Configuration → Edit**
+
+Paste this:
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["GET"],
+    "AllowedOrigins": ["*"],
+    "ExposeHeaders": []
+  }
+]
+```
+
+✔ Fixes CORS issues
+✔ Lets any frontend load GET objects
+
+---
+
+# ✅ **Step 5: Test S3 URL**
+
+Open your uploaded image:
+
+```
+https://my-cors-demo-bucket-009.s3.amazonaws.com/image.png
+```
+
+If the image displays → permissions and CORS are correct.
+
+---
+
+# ✅ **Step 6: Create index.html (Load Image on Button Click)**
+
+Create a file named **index.html**:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Load S3 Image on Button Click</title>
+</head>
+<body style="font-family: Arial; text-align: center; margin-top: 50px;">
+
+    <h2>Load Image from S3 using Button</h2>
+
+    <button onclick="loadImage()" style="padding: 10px 20px; font-size: 16px;">
+        Load Image
+    </button>
+
+    <br><br>
+
+    <img id="s3Image" src="" alt="Image will load here" width="300"
+         style="display:none; border:1px solid #ddd; padding:10px;">
+
+    <script>
+        function loadImage() {
+            const imageUrl = "https://my-cors-demo-bucket-009.s3.amazonaws.com/image.png";
+            const img = document.getElementById("s3Image");
+
+            img.src = imageUrl;
+            img.style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
+```
+
+---
+
+# ✅ **Step 7: Run the Test**
+
+1. Open `index.html` in your browser
+2. Click **Load Image**
+3. You should now see the S3 image appear without errors
+
+---
+!
+
 
 
 
