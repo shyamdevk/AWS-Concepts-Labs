@@ -5859,9 +5859,99 @@ aws sqs delete-message --queue-url <URL> --receipt-handle <handle>
 * Ideal for decoupled, async systems
 * Cheap, secure, fault-tolerant
 
----
-Here is your **clean, simple, decorated `README.md`** for **AWS CORS Notes**, with slightly more explanation where needed — perfect for GitHub or study notes 👇
+# 📦 AWS SQS – Simple Hands-On Lab
 
+This lab teaches complete beginners how to use **Amazon Simple Queue Service (SQS)** using only the AWS Console.
+You will **create a queue → send a message → receive it → delete it**.
+
+---
+
+## ✅ Prerequisites
+
+* AWS account
+* Access to AWS Console
+
+---
+
+## 🟩 Step 1 — Open SQS
+
+1. Login to AWS Console
+2. Search for **SQS**
+3. Open **Simple Queue Service**
+
+---
+
+## 🟩 Step 2 — Create a Queue
+
+1. Click **Create queue**
+2. Select **Standard queue**
+3. Enter queue name:
+
+   ```
+   my-demo-queue
+   ```
+4. Scroll down → Click **Create queue**
+
+✔ The queue is created successfully.
+
+---
+
+## 🟩 Step 3 — Send a Message
+
+1. Open your queue: **my-demo-queue**
+2. Click **Send and receive messages**
+3. In the **Message body**, type:
+
+   ```
+   Hello from SQS
+   ```
+4. Click **Send message**
+
+✔ Message sent successfully.
+
+---
+
+## 🟩 Step 4 — Receive the Message
+
+1. In the same window, click **Poll for messages**
+2. Wait for the message to appear
+3. Click the message to view its content
+
+✔ You have received your message.
+
+---
+
+## 🟩 Step 5 — Delete the Message
+
+1. Select the message
+2. Click **Delete**
+3. Confirm the deletion
+
+✔ Your message has been removed from the queue.
+
+---
+
+## 🟩 Step 6 — Clean Up
+
+To avoid keeping unused resources:
+
+1. Go back to the SQS main page
+2. Select **my-demo-queue**
+3. Click **Delete queue**
+
+✔ Queue deleted.
+
+---
+
+## 🎉 Lab Completed!
+
+You successfully learned how to:
+
+* Create an SQS queue
+* Send a message
+* Receive & view the message
+* Delete the message
+* Delete the queue
 ---
 
 # 🌐 **AWS CORS – Cross-Origin Resource Sharing**
