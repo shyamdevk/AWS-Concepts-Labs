@@ -6851,18 +6851,18 @@ Developer → Build Docker Image
 
 ```
 
-[ Developer ]
-|
-v
+    [ Developer ]
+         |
+         v
 [ Docker Image Build ]
-|
-v
-[ Push Image to ECR ]
-|
-v
+         |
+         v
+ [ Push Image to ECR ]
+         |
+         v
 [ AWS ECS / EKS / Lambda Pulls Image ]
-|
-v
+         |
+         v
 [ Application Runs ]
 
 ```
