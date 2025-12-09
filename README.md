@@ -7347,142 +7347,195 @@ Different engines (use with AWS SCT)
 * Pay only for the replication instance ✔
 
 ---
-# AWS DMS Lab — Step-by-step
+# 🚀 AWS DMS LAB — END-TO-END MIGRATION USING MYSQL (RDS ➝ RDS)
 
-> Clean, ordered lab progress for migrating data using AWS DMS (2 RDS, 2 EC2 instances).
-
----
-
-## Assumptions / Prerequisites
-
-* You have an AWS account with permissions to create EC2, RDS, DMS resources, IAM roles, and security groups.
-* A VPC, at least two subnets (private or public depending on your setup), and an Internet Gateway/NAT as required.
-* Region chosen where you'll create resources.
-* (Optional but recommended) An IAM role for DMS with `AmazonDMSVPCManagementRole` and access to relevant KMS keys if you enable encryption.
+A clean, structured, beginner‑friendly **README.md** for your AWS Database Migration Service (DMS) Lab.
 
 ---
 
-## High-level architecture
+## 📌 **Lab Overview**
 
-1. **Source side**: EC2 Instance (source) running MySQL connecting to a *self-managed RDS instance* (source RDS).
-2. **Target side**: EC2 Instance (destination) and an *self-managed RDS instance* (target RDS).
-3. **AWS DMS**: A single-AZ replication instance that connects to both endpoints and runs a migration task.
+This lab walks you through migrating data from a **Source MySQL RDS** to a **Target MySQL RDS** using:
+
+* 2 EC2 Instances (Source + Target)
+* 2 Self-managed RDS instances
+* AWS DMS (Replication Instance, Endpoints, Migration Task)
+
+The goal is to verify successful data movement using DMS Full Load migration.
 
 ---
 
-## Step-by-step lab progress
+# 🏗️ **Lab Architecture (High Level)**
 
-### 1. Prepare network and security
-
-1. Create or choose a VPC and two subnets (one for source resources and one for target resources). Ensure DMS replication instance subnet group will include these subnets.
-2. Create security groups:
-
-   * **SG-Source-DB**: Allow inbound MySQL/Aurora (TCP 3306) from the source EC2 and from the DMS replication instance SG.
-   * **SG-Source-EC2**: Allow SSH (22) from your IP for management and outbound to 3306 to RDS.
-   * **SG-Target-DB**: Allow inbound MySQL/Aurora (3306) from the destination EC2 and from the DMS replication instance SG.
-   * **SG-Target-EC2**: Allow SSH (22) from your IP for management and outbound to 3306 to RDS.
-   * **SG-DMS**: Allow outbound to 3306 on both source and target RDS security groups. Also allow inbound from your IP if you need to test connectivity from the replication instance (optional).
-3. Edit existing security groups for RDS to allow connections from the EC2 instances and DMS SGs (specifically allow TCP 3306).
-
-> Note: Use specific IP ranges and SG references instead of 0.0.0.0/0 in production.
-
-### 2. Create the two self-managed RDS instances
-
-1. Launch **RDS Source** (MySQL-compatible): configure engine version, instance class, storage, username/password (note them securely).
-2. Launch **RDS Target** (MySQL-compatible/Aurora if preferred): configure similar settings.
-3. Ensure both are launched in the correct subnets and assigned the proper security groups (SG-Source-DB and SG-Target-DB respectively).
-4. If publicly accessible is disabled, ensure EC2 that needs to access them is in the same VPC/subnet or has proper routing.
-
-### 3. Launch two EC2 instances (Source and Destination)
-
-1. Launch **EC2-Source** and **EC2-Destination** in appropriate subnets.
-2. Attach SG-Source-EC2 and SG-Target-EC2 respectively.
-3. SSH into source instance and install MySQL client (and server if you want self-managed DB on EC2):
-
-```bash
-# On EC2-Source (Amazon Linux / Ubuntu examples)
-sudo yum update -y || sudo apt update -y
-sudo yum install -y mysql || sudo apt install -y mysql-client
-# if you plan to run server on the EC2 itself:
-sudo yum install -y mariadb-server || sudo apt install -y mysql-server
+```
+EC2-Source  →  Source RDS  →  AWS DMS  →  Target RDS  →  EC2-Destination
 ```
 
-### 4. Configure source database and add sample data
+---
 
-1. From **EC2-Source**, connect to the **source RDS** using the RDS endpoint, username and password:
+# ✅ **1. Prerequisites**
+
+* AWS Account
+* VPC + Subnets
+* Security Groups configured for MySQL (port 3306)
+* IAM permissions for RDS, EC2, DMS
+
+---
+
+# 🛡️ **2. Networking & Security Group Setup**
+
+Create these Security Groups:
+
+### **SG-Source-DB**
+
+* Allow inbound **3306** from:
+
+  * SG-Source-EC2
+  * SG-DMS
+
+### **SG-Target-DB**
+
+* Allow inbound **3306** from:
+
+  * SG-Target-EC2
+  * SG-DMS
+
+### **SG-DMS**
+
+* Allow outbound **3306** to both RDS instances.
+
+---
+
+# 🗄️ **3. Create Two RDS Instances (MySQL)**
+
+1. Create **Source RDS (MySQL)**
+2. Create **Target RDS (MySQL)**
+3. Attach the correct DB Security Groups
+4. Note the RDS endpoints
+
+---
+
+# 💻 **4. Launch EC2 Instances (Source & Destination)**
+
+### **Source EC2**
+
+Install MySQL:
+
+```bash
+sudo yum update -y
+sudo yum install -y mariadb-server mariadb
+```
+
+### **Destination EC2**
+
+Install MySQL client:
+
+```bash
+sudo yum update -y
+sudo yum install -y mariadb
+```
+
+---
+
+# 🛠️ **5. Configure Source Database & Add Sample Data**
+
+From **EC2‑Source**:
 
 ```bash
 mysql -h <source-rds-endpoint> -u <username> -p
-# then inside MySQL prompt
+```
+
+Inside MySQL:
+
+```sql
 CREATE DATABASE dms_demo;
 USE dms_demo;
+
 CREATE TABLE employees (
   id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100),
   role VARCHAR(100),
   salary DECIMAL(10,2)
 );
+
 INSERT INTO employees (name, role, salary) VALUES
 ('Alice','Engineer',70000.00),
 ('Bob','Analyst',60000.00),
 ('Charlie','Manager',90000.00);
-COMMIT;
 ```
 
-2. Verify data:
+Verify:
 
 ```sql
-SELECT * FROM dms_demo.employees;
+SELECT * FROM employees;
 ```
 
-### 5. Configure target server readiness
+---
 
-1. From **EC2-Destination**, verify you can connect to the **target RDS**:
+# 🔍 **6. Validate Target RDS Access**
+
+From **EC2-Destination**:
 
 ```bash
 mysql -h <target-rds-endpoint> -u <username> -p
-# check databases
 SHOW DATABASES;
 ```
 
-2. If target DB does not exist, DMS can create schema/tables during migration (depending on task settings). Otherwise create the target database `dms_demo` now to make validation simpler.
+(Optional) Create target DB:
 
-### 6. Create DMS replication instance (Single AZ)
+```sql
+CREATE DATABASE dms_demo;
+```
 
-1. In AWS Console → Database Migration Service → Replication Instances → Create replication instance.
-2. Choose instance class (e.g., dms.t3.medium for labs), allocate storage, and select **Multi-AZ = No** (Single AZ).
-3. Choose or create a replication subnet group (include subnets where the replication instance can reach source and target RDS).
-4. Attach **SG-DMS** security group so the instance can talk to RDS endpoints.
-5. Wait until the replication instance status becomes **Available**.
+---
 
-### 7. Create DMS endpoints (Source and Target)
+# 🔁 **7. Create DMS Replication Instance (Single AZ)**
 
-1. Go to **Endpoints → Create endpoint**.
-2. **Source endpoint**:
+Go to: **AWS Console → DMS → Replication Instances → Create**
 
-   * Endpoint type: Source
-   * Engine: MySQL (or Aurora MySQL)
-   * Server name: source RDS endpoint
-   * Port: 3306
-   * Username/password: the database credentials
-   * SSL mode: **none** (per your instruction)
-   * Test connection uses: select the replication instance created above
-3. **Destination endpoint**: repeat with the target RDS details and SSL mode none.
-4. After creating each endpoint, run **Test endpoint connection** for both (choose replication instance). Confirm `Successful` result.
+* Instance class: `dms.t3.medium`
+* Multi-AZ: **No**
+* Subnet group: Choose appropriate subnets
+* Security group: **SG-DMS**
 
-### 8. Create a DMS migration task
+Wait for **Available**.
 
-1. Go to **Database migration tasks → Create task**.
-2. Task identifier: e.g., `dms-migrate-demo`.
-3. Replication instance: choose the one you created.
-4. Source endpoint: choose source endpoint.
-5. Target endpoint: choose target endpoint.
-6. Migration type: choose **Full load** (or **Full load + CDC** if you want to capture ongoing changes).
-7. Task settings: use default or customize JSON for table mapping, logging, error behavior.
+---
 
-**Table mapping (Selection rule)**
+# 🔗 **8. Create DMS Endpoints (Source & Target)**
 
-* Under **Table mappings** add a selection rule to include the database and table you want to migrate. Example mapping JSON (simple):
+### **Source Endpoint**
+
+* Type: Source
+* Engine: MySQL
+* SSL: None
+* Provide username/password
+
+### **Target Endpoint**
+
+* Type: Target
+* Engine: MySQL
+* SSL: None
+
+### **Run Test Connection (Both)**
+
+Must show **Successful**.
+
+---
+
+# 📦 **9. Create DMS Migration Task**
+
+Go to: **DMS → Tasks → Create Task**
+
+### **Task Configuration**
+
+* Task type: **Full Load**
+* Source: MySQL source endpoint
+* Target: MySQL target endpoint
+
+### **Table Mapping Rule**
+
+Add selection rule:
 
 ```json
 {
@@ -7490,7 +7543,7 @@ SHOW DATABASES;
     {
       "rule-type": "selection",
       "rule-id": "1",
-      "rule-name": "select-dms-demo",
+      "rule-name": "include-database",
       "object-locator": {
         "schema-name": "dms_demo",
         "table-name": "%"
@@ -7501,18 +7554,13 @@ SHOW DATABASES;
 }
 ```
 
-* Alternatively add rules via the console by specifying Database name `dms_demo` and table `employees` (or `%` for all tables).
+Create Task → **Start Task**.
 
-8. (Optional) Add transformation rules if you want to rename schema or table on the target.
+---
 
-### 9. Start the task
+# 🧪 **10. Verify Migration on Target RDS**
 
-1. Create the task and then **Start** it (you can choose to start task on creation or start later).
-2. Monitor the task status in the console. Look at **Table statistics** and **CloudWatch logs** for progress.
-
-### 10. Verify migration on destination
-
-1. SSH into **EC2-Destination** and connect to `target-rds` endpoint:
+From **EC2-Destination**:
 
 ```bash
 mysql -h <target-rds-endpoint> -u <username> -p
@@ -7520,61 +7568,34 @@ USE dms_demo;
 SELECT * FROM employees;
 ```
 
-2. Confirm that rows match the source table. If you used Full load + CDC, confirm changes made after starting the task are also replicated.
-
-### 11. Troubleshooting and checks
-
-* If endpoint test fails:
-
-  * Verify security groups allow traffic from SG-DMS to port 3306.
-  * Verify replication instance is in same VPC and subnets that can route to RDS.
-  * Confirm username/password are correct and the DB user has appropriate privileges (SELECT, RELOAD, REPLICATION CLIENT if using CDC, SHOW VIEW if necessary).
-
-* Required privileges for MySQL source user (example):
-
-```sql
-GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'dmsuser'@'%';
-FLUSH PRIVILEGES;
-```
-
-* Check DMS task events and CloudWatch logs for errors.
-
-### 12. Post-migration confirmation and cleanup
-
-1. Confirm all target tables and rows are present.
-2. Validate counts: `SELECT COUNT(*) FROM dms_demo.employees;` on both source and target.
-3. When lab done, delete replication instance, endpoints, EC2s, and RDS instances to avoid charges.
+✔️ Data should match source.
 
 ---
 
-## Useful SQL snippets (copy-paste)
+# 🩹 **11. Troubleshooting Tips**
+
+### Test fails?
+
+* Check SG-DMS allowed outbound 3306
+* DB user must have SELECT privileges
+* RDS must be reachable from DMS subnet
+
+MySQL DMS-required permissions:
 
 ```sql
--- create database & table on source
-CREATE DATABASE dms_demo;
-USE dms_demo;
-CREATE TABLE employees (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(100),
-  role VARCHAR(100),
-  salary DECIMAL(10,2)
-);
-INSERT INTO employees (name, role, salary) VALUES
-('Alice','Engineer',70000.00),
-('Bob','Analyst',60000.00),
-('Charlie','Manager',90000.00);
--- grant privileges for DMS
 GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'dmsuser'@'%';
 FLUSH PRIVILEGES;
--- check count on source/target
-SELECT COUNT(*) FROM dms_demo.employees;
 ```
 
+---
 
+# 🧹 **12. Cleanup**
 
+To avoid costs, delete:
 
+* DMS Replication Instance
+* DMS Endpoints
+* EC2 Instances
+* RDS Instances
 
-
-
-
-
+---
