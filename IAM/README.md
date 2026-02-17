@@ -1,5 +1,23 @@
 # 🔐 AWS Identity and Access Management (IAM)
 
+## 📌 Introduction
+
+AWS Identity and Access Management (IAM) is a core AWS service that helps you **securely control access to AWS resources**.
+
+With IAM, you can:
+- 👤 Create and manage **Users**
+- 👥 Create **Groups** to organize users
+- 🔐 Assign **Permissions using Policies**
+- 🎭 Create **Roles** for temporary access
+- 🏢 Manage **cross-account access**
+
+IAM follows the principle of **Least Privilege** —  
+👉 Give only the permissions required, nothing more.
+
+IAM is a **global service** (not region-based).
+
+---
+
 ### 👤 IAM Limits
 - **Users:** Up to `5000`
 - **Groups:** Up to `300`
@@ -184,3 +202,6 @@ Then go to AWS Console → **Switch Role**
 | Billing  | Per user                       | Consolidated Billing            |
 
 ---
+
+```
+
