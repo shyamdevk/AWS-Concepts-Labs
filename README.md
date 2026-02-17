@@ -2,10 +2,9 @@
 # ☁️ AWS Learning Notes & Hands-On Labs
 
 <p align="center">
-  <img src="https://media.giphy.com/media/coxQHKASG60HrHtvkt/giphy.gif" width="500"/>
+  <img src="https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif" width="500"/>
 </p>
 
----
 
 ## 🚀 About This Repository
 
