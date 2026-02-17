@@ -1,4 +1,4 @@
-## 🪣 Amazon S3 (Simple Storage Service)
+# 🪣 Amazon S3 (Simple Storage Service)
 
 ![AWS GIF](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/s3.gif)
 
