@@ -377,3 +377,202 @@ You have implemented:
 * ✔ Practical testing
 
 ---
+# **📧 AWS SES (Simple Email Service)**
+
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/ses.gif)
+
+## ⭐ What is AWS SES?
+AWS SES is a cloud service used to **send emails** such as:
+- OTP / Password reset  
+- Marketing emails  
+- Bulk or notification emails  
+
+You don’t need to manage SMTP servers—AWS handles it.
+
+---
+
+## ⭐ Why AWS SES?
+- ✅ Very cheap  
+- ✅ Reliable delivery  
+- ✅ Can send millions of emails  
+- ✅ No server setup  
+- ✅ Easy AWS integration  
+
+---
+
+## ⭐ How SES Works (Simple Flow)
+1. Verify your **email** or **domain**  
+2. Send email using **SMTP / API / CLI**  
+3. SES forwards it to the recipient  
+4. SES gives feedback (bounce, complaint, success)  
+
+---
+
+## ⭐ Methods to Send Email
+- **SMTP** → works like a normal mail server  
+- **API / SDK** → secure and recommended  
+- **AWS CLI**  
+- **Console** (for testing)  
+
+---
+
+## ⭐ Sandbox vs Production
+
+### 🧪 Sandbox Mode  
+- Only send to **verified** emails  
+- Low sending limits  
+- Testing environment  
+
+### 🚀 Production Mode  
+- Send to **anyone**  
+- Higher limits  
+- For real applications  
+
+---
+
+## ⭐ Security in SES
+- **Email / Domain verification**  
+- **SPF & DKIM** for trust and anti-spoofing  
+- **IAM policies** to control access  
+- **TLS encryption**  
+- **Bounce/complaint handling** via SNS  
+
+---
+
+## ⭐ Use Cases
+- OTP & password reset  
+- Order confirmation  
+- Marketing campaigns  
+- Newsletters  
+- Bulk emailing  
+- App alerts and notifications  
+
+---
+
+## 📌 Summary Table
+
+| Topic | Simple Meaning |
+|-------|----------------|
+| AWS SES | Service to send emails |
+| Why SES | Cheap, reliable, scalable |
+| Methods | SMTP, API/SDK, CLI |
+| Sandbox | Testing-only mode |
+| Production | Real email sending |
+| Security | SPF, DKIM, IAM, TLS |
+| Use Cases | OTP, marketing, alerts |
+
+---
+Here is your **decorated and simple `README.md`** for the **AWS SES Practice Lab** 👇
+(You can copy-paste directly)
+
+---
+# 📧 AWS SES – Simple Practice Lab
+
+This is a **beginner-friendly lab** to help you practice Amazon SES (Simple Email Service) in the **easiest way**.  
+No coding — just sending emails using AWS SES in Sandbox Mode.
+
+---
+
+## 🚀 What You Will Do
+- Verify an email identity  
+- Create SMTP credentials  
+- Send a test email from SES  
+- Optionally send via SMTP  
+- View sending logs  
+
+---
+
+# 🧪 Step 1: Open AWS SES Console
+1. Login to AWS  
+2. Navigate to **SES → Verified Identities**  
+3. Make sure you select a region (example: `us-east-1`)
+
+---
+
+# 🧪 Step 2: Verify Your Email Address
+Sandbox mode requires you to verify emails.
+
+1. Go to **Verified Identities**  
+2. Click **Create Identity**  
+3. Choose **Email**  
+4. Enter your email → **Create Identity**  
+5. Open your inbox → Click the verification link  
+
+✅ Your email is now verified.
+
+---
+
+# 🧪 Step 3: Create SMTP Credentials
+SES SMTP credentials are different from IAM credentials.
+
+1. Go to **SMTP Settings**  
+2. Click **Create SMTP Credentials**  
+3. Copy:
+   - SMTP Username  
+   - SMTP Password  
+4. Note the **SMTP Endpoint**, e.g.:  
+```
+
+email-smtp.us-east-1.amazonaws.com
+
+```
+
+---
+
+# 🧪 Step 4: Send a Test Email (Easiest Way)
+1. Go to **Email Sending → Email Testing**  
+2. Click **Send Test Email**  
+3. Select:
+- **From Address:** your verified email  
+- **To Address:** your verified email  
+4. Enter any subject + message  
+5. Click **Send Test Email**
+
+📩 Check your inbox — your test email should arrive!
+
+---
+
+# 🧪 Step 5: Optional — Send Using SMTP
+You can test SMTP using any email client or SMTP tester app.
+
+Use these settings:
+
+| Setting | Value |
+|--------|-------|
+| SMTP Server | SES SMTP Endpoint |
+| Port | 587 |
+| Username | SMTP Username |
+| Password | SMTP Password |
+| Encryption | TLS |
+
+Send an email → It will be delivered through SES.
+
+---
+
+# 🧪 Step 6: View Your Email Logs
+1. Go to **Sending Statistics**  
+2. Check:
+- Sends  
+- Delivery  
+- Bounces  
+- Complaints  
+
+This helps you understand how your email traffic performs.
+
+---
+
+# 🎉 Lab Completed
+You have successfully:
+- Verified an email  
+- Created SMTP credentials  
+- Sent test emails  
+- Viewed logs  
+
+This is the **foundation of working with AWS SES**.
+
+---
+
+## 📌 Tip
+To send emails to **any address**, request to move from **Sandbox Mode → Production Mode** in the SES console.
+
+---
