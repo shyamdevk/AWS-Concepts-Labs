@@ -351,3 +351,278 @@ This lab helps you understand:
 * Monitoring EC2 instances effectively
 
 ---
+# 📘 **AWS SQS - Amazon Simple Queue Service**
+
+![Screenshot](https://github.com/shyamdevk/AWS-Concepts-Labs/blob/images/sqs.gif)
+---
+
+## 🧭 **What is Amazon SQS?**
+
+**Amazon Simple Queue Service (SQS)** is a **fully managed message queue** service that allows different parts of an application to communicate **asynchronously**.
+
+➡️ **SQS = Temporary storage for messages until a worker processes them**
+
+**Why use it?**
+
+* To **decouple** microservices
+* To **avoid system overload**
+* To **ensure messages are never lost**
+
+---
+
+# 🟦 **Types of SQS Queues**
+
+## 🔹 **1. Standard Queue (Default)**
+
+* Supports **unlimited throughput**
+* **At-least-once delivery**
+* **Best-effort ordering** (not guaranteed)
+* Suitable for high-scale systems
+  ➡️ Use when *ordering is not important*.
+
+## 🔹 **2. FIFO Queue (First-In-First-Out)**
+
+* **Strict ordering** guaranteed
+* **Exactly-once processing**
+* Lower throughput than Standard
+* Supports “**Message Group ID**” for parallel processing
+  ➡️ Use when *order matters* (payments, transactions).
+
+---
+
+# 🚀 **How SQS Works (Simple Flow)**
+
+1️⃣ **Producer sends message → SQS Queue**
+2️⃣ SQS stores the message durably
+3️⃣ **Consumer polls** the queue
+4️⃣ Consumer processes the message
+5️⃣ Consumer **deletes message** from queue
+
+➡️ If not deleted, message becomes visible again after *visibility timeout*.
+
+---
+
+# 🔐 **Important Concepts**
+
+### 📨 **Message**
+
+* Max size: **256 KB**
+* Can be JSON, text, XML, etc.
+
+### ⏲️ **Visibility Timeout**
+
+* Time during which a message stays **hidden** after being read.
+* Prevents multiple workers from processing the same message.
+
+### 📅 **Message Retention**
+
+* How long SQS stores a message (1 min → 14 days).
+
+### 🗳️ **Dead Letter Queue (DLQ)**
+
+Failed messages (not processed after X retries) go into a **DLQ** for debugging.
+
+### 🔁 **Long Polling**
+
+* Waits until a message arrives (reduces empty responses).
+* Cheaper & more efficient.
+
+---
+
+# 🛠️ **Features of SQS**
+
+### ✔️ **Decoupling**
+
+Connect services without direct communication.
+
+### ✔️ **Highly Scalable**
+
+Handles **millions of messages per second** automatically.
+
+### ✔️ **Durable**
+
+Messages stored across **multiple AZs**.
+
+### ✔️ **Secure**
+
+Supports:
+
+* IAM policies
+* KMS encryption
+* Private access via VPC Endpoint
+
+### ✔️ **Fully Managed**
+
+No servers, no maintenance.
+
+---
+
+# 🎯 **When to Use SQS?**
+
+* Microservices communication
+* Order processing systems
+* Video/image processing pipelines
+* Logging & monitoring systems
+* Asynchronous tasks
+* Queue-based batch processing
+
+---
+
+# 🧰 **SQS Basic Commands (AWS CLI)**
+
+```bash
+# Create queue
+aws sqs create-queue --queue-name MyQueue
+
+# List queues
+aws sqs list-queues
+
+# Send message
+aws sqs send-message --queue-url <URL> --message-body "Hello"
+
+# Receive message
+aws sqs receive-message --queue-url <URL>
+
+# Delete message
+aws sqs delete-message --queue-url <URL> --receipt-handle <handle>
+```
+
+---
+
+# 📌 **SQS Pricing (Simple Overview)**
+
+* First **1 million requests free/month**
+* After that pay per request (very cheap)
+* FIFO queues cost slightly more
+
+---
+
+# 🔄 **SNS vs SQS (Interview Notes)**
+
+| Feature       | SNS                  | SQS                    |
+| ------------- | -------------------- | ---------------------- |
+| Type          | Pub/Sub              | Message Queue          |
+| Delivers To   | Multiple subscribers | One consumer at a time |
+| Message Order | No                   | FIFO (optional)        |
+| Use Case      | Broadcast            | Decoupling workers     |
+
+---
+
+# 🧪 **Example Use Case (Simple)**
+
+### 🛍️ **E-commerce Order Workflow**
+
+1. User places an order
+2. Backend sends order message → **SQS**
+3. Worker reads message
+4. Worker processes payment, inventory, email
+5. Message deleted
+
+➡️ System is scalable + reliable.
+
+---
+
+# 📝 **Final Summary**
+
+* SQS = **Scalable message queue**
+* Two types: **Standard** & **FIFO**
+* Key elements: Visibility Timeout, DLQ, Long Polling
+* Ideal for decoupled, async systems
+* Cheap, secure, fault-tolerant
+
+# 📦 AWS SQS – Simple Hands-On Lab
+
+This lab teaches complete beginners how to use **Amazon Simple Queue Service (SQS)** using only the AWS Console.
+You will **create a queue → send a message → receive it → delete it**.
+
+---
+
+## ✅ Prerequisites
+
+* AWS account
+* Access to AWS Console
+
+---
+
+## 🟩 Step 1 — Open SQS
+
+1. Login to AWS Console
+2. Search for **SQS**
+3. Open **Simple Queue Service**
+
+---
+
+## 🟩 Step 2 — Create a Queue
+
+1. Click **Create queue**
+2. Select **Standard queue**
+3. Enter queue name:
+
+   ```
+   my-demo-queue
+   ```
+4. Scroll down → Click **Create queue**
+
+✔ The queue is created successfully.
+
+---
+
+## 🟩 Step 3 — Send a Message
+
+1. Open your queue: **my-demo-queue**
+2. Click **Send and receive messages**
+3. In the **Message body**, type:
+
+   ```
+   Hello from SQS
+   ```
+4. Click **Send message**
+
+✔ Message sent successfully.
+
+---
+
+## 🟩 Step 4 — Receive the Message
+
+1. In the same window, click **Poll for messages**
+2. Wait for the message to appear
+3. Click the message to view its content
+
+✔ You have received your message.
+
+---
+
+## 🟩 Step 5 — Delete the Message
+
+1. Select the message
+2. Click **Delete**
+3. Confirm the deletion
+
+✔ Your message has been removed from the queue.
+
+---
+
+## 🟩 Step 6 — Clean Up
+
+To avoid keeping unused resources:
+
+1. Go back to the SQS main page
+2. Select **my-demo-queue**
+3. Click **Delete queue**
+
+✔ Queue deleted.
+
+---
+
+## 🎉 Lab Completed!
+
+You successfully learned how to:
+
+* Create an SQS queue
+* Send a message
+* Receive & view the message
+* Delete the message
+* Delete the queue
+---
+
+# 🌐 **AWS CORS – Cross-Origin Resource Sharing**
